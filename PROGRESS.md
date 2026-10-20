@@ -11,6 +11,12 @@
 |---|------|----------|---------|--------|
 | 1 | 2026-10-20 | 60 min | Installed Terraform 1.16.6 (HashiCorp APT repo) + VS Code extension in WSL; read the 004 objectives; first project: `local_file` with the `local` provider (v2.9.1), full cycle fmt → init → validate → plan → apply → state list/show → destroy; read the state file line by line | `01-local-file/` |
 
+## Quiz log
+
+| Session | Date | Score | Missed |
+|---------|------|-------|--------|
+| 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
+
 ## Exam objectives — status
 
 | # | Domain | Status |
@@ -31,12 +37,12 @@
 - **Domain 6 – State management:** same.
 - **Domain 8 – HCP Terraform:** same.
 - **New in 004 (not in 003):** 4f `depends_on` / `create_before_destroy`, 4g custom conditions, 4h ephemeral values & write-only arguments, 8c HCP Terraform workspaces & projects. Many prep courses are still 003-based, so check these 4 topics explicitly.
-- **Version constraints** (session 1): wrote `>= 2.5` instead of `~> 2.5`. `~>` lets only the rightmost written number move: `~> 2.5` = `>= 2.5, < 3.0`; `~> 2.5.0` = `>= 2.5.0, < 2.6.0`.
+- **Version constraints** (session 1): wrote `>= 2.5` instead of `~> 2.5`. `~>` lets only the rightmost written number move: `~> 2.5` = `>= 2.5, < 3.0`; `~> 2.5.0` = `>= 2.5.0, < 2.6.0`. Right in quiz 1 (Q2); keep checking it in your own code.
 - **Provider source address** (session 1): `[HOSTNAME/]NAMESPACE/TYPE`, default hostname `registry.terraform.io` (typo `hasicorp` → init failed).
 - **Resource type = provider local name + `_` + type** (session 1): wrote `resource "local"` instead of `resource "local_file"` → caught by `validate`.
 - **Saved plans:** `terraform plan -out=tfplan` then `terraform apply tfplan` applies exactly that plan, with no prompt.
 - **`terraform fmt`** only formats the current directory; use `-recursive` for subfolders.
-- **State holds secrets in plain text**, even attributes marked sensitive → never commit it, use a remote backend with encryption and access control.
+- **State holds secrets in plain text**, even attributes marked sensitive → never commit it, use a remote backend with encryption and access control. **Missed in quiz 1 (Q4).** `sensitive = true` only hides the value in CLI output (plan/apply), not in the state file.
 
 ## Sub-objectives checklist
 
