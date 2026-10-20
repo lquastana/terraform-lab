@@ -11,6 +11,7 @@
 |---|------|----------|---------|--------|
 | 1 | 2026-10-20 | 60 min | Installed Terraform 1.16.6 (HashiCorp APT repo) + VS Code extension in WSL; read the 004 objectives; first project: `local_file` with the `local` provider (v2.9.1), full cycle fmt → init → validate → plan → apply → state list/show → destroy; read the state file line by line | `01-local-file/` |
 | 2 | 2026-10-20 | 40 min (bonus, evening) | Two providers (`local` 2.9.1 + `random` 3.9.1); `random_pet` → `local_file` implicit dependency; variable `greeting` + 2 outputs; idempotency ("No changes"); `-var` triggers `-/+` replacement (`# forces replacement`); variable precedence experiment (tfvars / `TF_VAR_` / `-var`) | `02-random-local/` |
+| 3 | 2026-10-20 | 30 min (bonus, evening) | State refactoring: `moved` block (rename `local_file.hello` → `greeting` with 0 to add/destroy); drift (file edited by hand → `local_file` seen as deleted → `+ create`); `removed` block with `destroy = false` (object kept on disk, dropped from state, "Removed resource still exists" error when the resource block is still there) | `03-state-refactor/` |
 
 ## Quiz log
 
@@ -18,6 +19,7 @@
 |---------|------|-------|--------|
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
+| 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
 
 ## Exam objectives — status
 
@@ -28,7 +30,7 @@
 | 3 | Core Terraform workflow | 🟨 Seen (session 1) |
 | 4 | Terraform configuration | 🟨 Seen (session 2: 4b, 4c) |
 | 5 | Terraform modules | ⬜ To do |
-| 6 | Terraform state management | ⬜ To do |
+| 6 | Terraform state management | 🟨 Seen (session 3: 6a, 6d) |
 | 7 | Maintain infrastructure with Terraform | ⬜ To do |
 | 8 | HCP Terraform | ⬜ To do |
 
@@ -44,6 +46,8 @@
 - **Resource type = provider local name + `_` + type** (session 1): wrote `resource "local"` instead of `resource "local_file"` → caught by `validate`.
 - **Saved plans:** `terraform plan -out=tfplan` then `terraform apply tfplan` applies exactly that plan, with no prompt.
 - **`terraform fmt`** only formats the current directory; use `-recursive` for subfolders.
+- **Drift: two paths** (missed in quiz 3, Q4): `terraform apply` = revert reality to the code; `terraform plan/apply -refresh-only` = accept reality into the state, infra untouched. `terraform refresh` is deprecated; `-refresh=false` skips the refresh (the opposite).
+- **`init` is not needed before every apply** (session 3): only after adding/changing a provider, a module or the backend.
 - **Variables in, outputs out** (missed in quiz 2, Q4): `variable` = input (parameter), `output` = return value (shown after apply, read by a parent as `module.<name>.<output>`), `locals` = internal, `data` = read from outside.
 - **Plan display order ≠ execution order** (session 2): the plan lists resources alphabetically; execution follows the dependency graph (`random_pet` was created before `local_file`).
 - **`-var` is not remembered** (session 2): each run without `-var` falls back to tfvars / default.
@@ -89,10 +93,10 @@
 - [ ] 5d Manage module versions
 
 ### 6. Terraform state management
-- [ ] 6a Describe the local backend
+- [x] 6a Describe the local backend
 - [ ] 6b Describe state locking
 - [ ] 6c Configure remote state using the backend block
-- [ ] 6d Manage resource drift and Terraform state (refresh-only, `moved`, `removed`)
+- [x] 6d Manage resource drift and Terraform state (refresh-only, `moved`, `removed`)
 
 ### 7. Maintain infrastructure with Terraform
 - [ ] 7a Import existing infrastructure into your Terraform workspace
