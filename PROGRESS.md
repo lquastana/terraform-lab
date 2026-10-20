@@ -10,12 +10,14 @@
 | # | Date | Duration | Covered | Folder |
 |---|------|----------|---------|--------|
 | 1 | 2026-10-20 | 60 min | Installed Terraform 1.16.6 (HashiCorp APT repo) + VS Code extension in WSL; read the 004 objectives; first project: `local_file` with the `local` provider (v2.9.1), full cycle fmt → init → validate → plan → apply → state list/show → destroy; read the state file line by line | `01-local-file/` |
+| 2 | 2026-10-20 | 40 min (bonus, evening) | Two providers (`local` 2.9.1 + `random` 3.9.1); `random_pet` → `local_file` implicit dependency; variable `greeting` + 2 outputs; idempotency ("No changes"); `-var` triggers `-/+` replacement (`# forces replacement`); variable precedence experiment (tfvars / `TF_VAR_` / `-var`) | `02-random-local/` |
 
 ## Quiz log
 
 | Session | Date | Score | Missed |
 |---------|------|-------|--------|
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
+| 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 
 ## Exam objectives — status
 
@@ -24,7 +26,7 @@
 | 1 | Infrastructure as Code (IaC) with Terraform | 🟨 Seen (concepts known from Ansible/DevOps) |
 | 2 | Terraform fundamentals | 🟨 Seen (session 1) |
 | 3 | Core Terraform workflow | 🟨 Seen (session 1) |
-| 4 | Terraform configuration | ⬜ To do |
+| 4 | Terraform configuration | 🟨 Seen (session 2: 4b, 4c) |
 | 5 | Terraform modules | ⬜ To do |
 | 6 | Terraform state management | ⬜ To do |
 | 7 | Maintain infrastructure with Terraform | ⬜ To do |
@@ -42,6 +44,10 @@
 - **Resource type = provider local name + `_` + type** (session 1): wrote `resource "local"` instead of `resource "local_file"` → caught by `validate`.
 - **Saved plans:** `terraform plan -out=tfplan` then `terraform apply tfplan` applies exactly that plan, with no prompt.
 - **`terraform fmt`** only formats the current directory; use `-recursive` for subfolders.
+- **Variables in, outputs out** (missed in quiz 2, Q4): `variable` = input (parameter), `output` = return value (shown after apply, read by a parent as `module.<name>.<output>`), `locals` = internal, `data` = read from outside.
+- **Plan display order ≠ execution order** (session 2): the plan lists resources alphabetically; execution follows the dependency graph (`random_pet` was created before `local_file`).
+- **`-var` is not remembered** (session 2): each run without `-var` falls back to tfvars / default.
+- **Variable precedence**, lowest → highest: `TF_VAR_` env vars < `terraform.tfvars` < `terraform.tfvars.json` < `*.auto.tfvars` (lexical order) < `-var` / `-var-file` on the CLI (last one wins).
 - **State holds secrets in plain text**, even attributes marked sensitive → never commit it, use a remote backend with encryption and access control. **Missed in quiz 1 (Q4).** `sensitive = true` only hides the value in CLI output (plan/apply), not in the state file.
 
 ## Sub-objectives checklist
@@ -54,7 +60,7 @@
 ### 2. Terraform fundamentals
 - [x] 2a Install and version Terraform providers
 - [x] 2b Describe how Terraform uses providers
-- [ ] 2c Write Terraform configuration using multiple providers
+- [x] 2c Write Terraform configuration using multiple providers
 - [x] 2d Explain how Terraform uses and manages state
 
 ### 3. Core Terraform workflow
@@ -68,8 +74,8 @@
 
 ### 4. Terraform configuration
 - [ ] 4a Use and differentiate resource and data blocks
-- [ ] 4b Refer to resource attributes and create cross-resource references
-- [ ] 4c Use variables and outputs
+- [x] 4b Refer to resource attributes and create cross-resource references
+- [x] 4c Use variables and outputs
 - [ ] 4d Understand and use complex types
 - [ ] 4e Write dynamic configuration using expressions and functions
 - [ ] 4f Define resource dependencies in configuration (`depends_on`, `create_before_destroy`) — *new in 004*
