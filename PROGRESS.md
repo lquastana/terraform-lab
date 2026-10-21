@@ -12,6 +12,7 @@
 | 1 | 2026-10-20 | 60 min | Installed Terraform 1.16.6 (HashiCorp APT repo) + VS Code extension in WSL; read the 004 objectives; first project: `local_file` with the `local` provider (v2.9.1), full cycle fmt → init → validate → plan → apply → state list/show → destroy; read the state file line by line | `01-local-file/` |
 | 2 | 2026-10-20 | 40 min (bonus, evening) | Two providers (`local` 2.9.1 + `random` 3.9.1); `random_pet` → `local_file` implicit dependency; variable `greeting` + 2 outputs; idempotency ("No changes"); `-var` triggers `-/+` replacement (`# forces replacement`); variable precedence experiment (tfvars / `TF_VAR_` / `-var`) | `02-random-local/` |
 | 3 | 2026-10-20 | 30 min (bonus, evening) | State refactoring: `moved` block (rename `local_file.hello` → `greeting` with 0 to add/destroy); drift (file edited by hand → `local_file` seen as deleted → `+ create`); `removed` block with `destroy = false` (object kept on disk, dropped from state, "Removed resource still exists" error when the resource block is still there) | `03-state-refactor/` |
+| 4 | 2026-10-21 | 60 min | `map(object)` variable; `for_each` (addresses `local_file.service["fhir"]`); `for` expression with `if` filter in `locals`; data source `local_file` reading a hand-made file; functions `join`, `trimspace`, `length`; `count` vs `for_each` experiment (removing a middle item shifts `count` indexes); `$( )` is bash, HCL interpolation is `${ }` | `04-collections/` |
 
 ## Quiz log
 
@@ -20,6 +21,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 4 | 2026-10-21 | 3/5 | Q2 unordered unique values = `set` (not `map`) · Q3 `count`: removing a middle item → `[1]` replaced + `[2]` destroyed, `[0]` untouched (not "all recreated") |
 
 ## Exam objectives — status
 
@@ -28,7 +30,7 @@
 | 1 | Infrastructure as Code (IaC) with Terraform | 🟨 Seen (concepts known from Ansible/DevOps) |
 | 2 | Terraform fundamentals | 🟨 Seen (session 1) |
 | 3 | Core Terraform workflow | 🟨 Seen (session 1) |
-| 4 | Terraform configuration | 🟨 Seen (session 2: 4b, 4c) |
+| 4 | Terraform configuration | 🟨 Seen (sessions 2 & 4: 4a–4e; 4f–4h still to do) |
 | 5 | Terraform modules | ⬜ To do |
 | 6 | Terraform state management | 🟨 Seen (session 3: 6a, 6d) |
 | 7 | Maintain infrastructure with Terraform | ⬜ To do |
@@ -46,6 +48,9 @@
 - **Resource type = provider local name + `_` + type** (session 1): wrote `resource "local"` instead of `resource "local_file"` → caught by `validate`.
 - **Saved plans:** `terraform plan -out=tfplan` then `terraform apply tfplan` applies exactly that plan, with no prompt.
 - **`terraform fmt`** only formats the current directory; use `-recursive` for subfolders.
+- **Types** (missed in quiz 4, Q2): `list` = ordered, index from 0, duplicates OK · `map` = `{ key = value }`, string keys · `set` = unordered, unique values, no index, no keys · `object` = named attributes with their own types · `tuple` = ordered positions with their own types.
+- **`count` vs `for_each`** (missed in quiz 4, Q3, right after doing the experiment): `count` identifies instances by position → removing a middle item shifts the following indexes (replace + destroy), earlier ones untouched. `for_each` identifies by key → only the removed key is destroyed.
+- **Interpolation** (session 4): `${ }` only inside quotes; never `$( )` (bash) and never `${ }` nested inside `${ }`. A bare expression needs no quotes. `validate` doesn't catch it: `$(` is just text.
 - **Drift: two paths** (missed in quiz 3, Q4): `terraform apply` = revert reality to the code; `terraform plan/apply -refresh-only` = accept reality into the state, infra untouched. `terraform refresh` is deprecated; `-refresh=false` skips the refresh (the opposite).
 - **`init` is not needed before every apply** (session 3): only after adding/changing a provider, a module or the backend.
 - **Variables in, outputs out** (missed in quiz 2, Q4): `variable` = input (parameter), `output` = return value (shown after apply, read by a parent as `module.<name>.<output>`), `locals` = internal, `data` = read from outside.
@@ -77,11 +82,11 @@
 - [x] 3g Apply formatting and style adjustments to a configuration
 
 ### 4. Terraform configuration
-- [ ] 4a Use and differentiate resource and data blocks
+- [x] 4a Use and differentiate resource and data blocks
 - [x] 4b Refer to resource attributes and create cross-resource references
 - [x] 4c Use variables and outputs
-- [ ] 4d Understand and use complex types
-- [ ] 4e Write dynamic configuration using expressions and functions
+- [x] 4d Understand and use complex types
+- [x] 4e Write dynamic configuration using expressions and functions
 - [ ] 4f Define resource dependencies in configuration (`depends_on`, `create_before_destroy`) — *new in 004*
 - [ ] 4g Validate configuration using custom conditions — *new in 004*
 - [ ] 4h Best practices for sensitive data, incl. secrets management with Vault (ephemeral values, write-only arguments) — *new in 004*
