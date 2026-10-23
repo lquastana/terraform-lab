@@ -23,6 +23,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 6b | 2026-10-23 | 5/5 | — (re-quiz on modules right after the explanations; incl. private registry `app.terraform.io/acme/app/azurerm` accepts `version`) |
 | 6 | 2026-10-23 | 1/5 | Q2 registry source = `<NAMESPACE>/<NAME>/<PROVIDER>` · Q3 parent reads `module.<call>.<output>` only · Q4 Git module pinned with `?ref=<tag>`, not `version` · Q5 child variable without default not set → error (end of a 2 h block: fatigue) |
 | 5 | 2026-10-23 | 4/5 | Q3 a failing `check` assertion = warning, apply continues (and Terraform never rolls back) |
 | 4 | 2026-10-21 | 3/5 | Q2 unordered unique values = `set` (not `map`) · Q3 `count`: removing a middle item → `[1]` replaced + `[2]` destroyed, `[0]` untouched (not "all recreated") |
@@ -35,7 +36,7 @@
 | 2 | Terraform fundamentals | 🟨 Seen (session 1) |
 | 3 | Core Terraform workflow | 🟨 Seen (session 1) |
 | 4 | Terraform configuration | 🟨 Seen (sessions 2, 4, 5: all of 4a–4h practiced) |
-| 5 | Terraform modules | 🟨 Seen (session 6, quiz 1/5 → redo on Sunday) |
+| 5 | Terraform modules | 🟨 Seen (session 6: quiz 1/5, re-quiz 5/5; next: `for_each` on modules, Git source with `?ref`) |
 | 6 | Terraform state management | 🟨 Seen (session 3: 6a, 6d) |
 | 7 | Maintain infrastructure with Terraform | ⬜ To do |
 | 8 | HCP Terraform | ⬜ To do |
