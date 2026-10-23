@@ -14,6 +14,7 @@
 | 3 | 2026-10-20 | 30 min (bonus, evening) | State refactoring: `moved` block (rename `local_file.hello` → `greeting` with 0 to add/destroy); drift (file edited by hand → `local_file` seen as deleted → `+ create`); `removed` block with `destroy = false` (object kept on disk, dropped from state, "Removed resource still exists" error when the resource block is still there) | `03-state-refactor/` |
 | 4 | 2026-10-21 | 60 min | `map(object)` variable; `for_each` (addresses `local_file.service["fhir"]`); `for` expression with `if` filter in `locals`; data source `local_file` reading a hand-made file; functions `join`, `trimspace`, `length`; `count` vs `for_each` experiment (removing a middle item shifts `count` indexes); `$( )` is bash, HCL interpolation is `${ }` | `04-collections/` |
 | 5 | 2026-10-23 | 2 h (day off) | New in 004: `depends_on` (hidden dependency), `create_before_destroy` (`-/+` → `+/-`, "deposed object"), `prevent_destroy` (blocks the whole run), `ignore_changes`; variable `validation`, `precondition`, `postcondition` with `self`, `check` block (warning only); `sensitive` variable/output (hidden in CLI, plain text in state and with `output -raw`); ephemeral `random_password` (opened/closed each run, never in state, rejected in `content`: not a write-only attribute) | `05-lifecycle/` |
+| 6 | 2026-10-23 | 25 min (day off, after session 5) | First child module `modules/service-file` (variables / main / outputs, heredoc content, `path.root`), called twice from the root; module addresses `module.fhir.local_file.this`; traps: parent can't read child resources (only outputs), `version` only for registry modules | `06-modules/` |
 
 ## Quiz log
 
@@ -22,6 +23,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 6 | 2026-10-23 | 1/5 | Q2 registry source = `<NAMESPACE>/<NAME>/<PROVIDER>` · Q3 parent reads `module.<call>.<output>` only · Q4 Git module pinned with `?ref=<tag>`, not `version` · Q5 child variable without default not set → error (end of a 2 h block: fatigue) |
 | 5 | 2026-10-23 | 4/5 | Q3 a failing `check` assertion = warning, apply continues (and Terraform never rolls back) |
 | 4 | 2026-10-21 | 3/5 | Q2 unordered unique values = `set` (not `map`) · Q3 `count`: removing a middle item → `[1]` replaced + `[2]` destroyed, `[0]` untouched (not "all recreated") |
 
@@ -33,7 +35,7 @@
 | 2 | Terraform fundamentals | 🟨 Seen (session 1) |
 | 3 | Core Terraform workflow | 🟨 Seen (session 1) |
 | 4 | Terraform configuration | 🟨 Seen (sessions 2, 4, 5: all of 4a–4h practiced) |
-| 5 | Terraform modules | ⬜ To do |
+| 5 | Terraform modules | 🟨 Seen (session 6, quiz 1/5 → redo on Sunday) |
 | 6 | Terraform state management | 🟨 Seen (session 3: 6a, 6d) |
 | 7 | Maintain infrastructure with Terraform | ⬜ To do |
 | 8 | HCP Terraform | ⬜ To do |
@@ -50,6 +52,7 @@
 - **Resource type = provider local name + `_` + type** (session 1): wrote `resource "local"` instead of `resource "local_file"` → caught by `validate`.
 - **Saved plans:** `terraform plan -out=tfplan` then `terraform apply tfplan` applies exactly that plan, with no prompt.
 - **`terraform fmt`** only formats the current directory; use `-recursive` for subfolders.
+- **Modules — all of it** (quiz 6: 1/5): sources = local `./` or `../` (no version) · public registry `<NAMESPACE>/<NAME>/<PROVIDER>` (e.g. `terraform-aws-modules/vpc/aws`) + `version` · private registry `<HOST>/<ORG>/<NAME>/<PROVIDER>` · Git `git::…?ref=<tag>` · the parent sees a module **only through its outputs** (`module.<call>.<output>`) · a child variable without default is **required** → error if the module block doesn't set it (the parent's variables are never inherited).
 - **Custom conditions** (missed in quiz 5, Q3, after seeing it live): `validation`, `precondition`, `postcondition` → **error**, the run stops · `check` → **warning**, the run continues. And Terraform **never** rolls back.
 - **Sensitive vs ephemeral** (session 5): `sensitive` hides in CLI output only (state, `output -raw`, `output -json` show plain text) · `ephemeral` is never stored (plan or state) and only fits write-only arguments (`*_wo` + `*_wo_version`), provider blocks, other ephemeral values.
 - **Types** (missed in quiz 4, Q2): `list` = ordered, index from 0, duplicates OK · `map` = `{ key = value }`, string keys · `set` = unordered, unique values, no index, no keys · `object` = named attributes with their own types · `tuple` = ordered positions with their own types.
@@ -96,9 +99,9 @@
 - [x] 4h Best practices for sensitive data, incl. secrets management with Vault (ephemeral values, write-only arguments) — *new in 004*
 
 ### 5. Terraform modules
-- [ ] 5a Explain how Terraform sources modules
-- [ ] 5b Describe variable scope within modules
-- [ ] 5c Use modules in configuration
+- [x] 5a Explain how Terraform sources modules
+- [x] 5b Describe variable scope within modules
+- [x] 5c Use modules in configuration
 - [ ] 5d Manage module versions
 
 ### 6. Terraform state management
