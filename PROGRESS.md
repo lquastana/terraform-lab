@@ -13,6 +13,7 @@
 | 2 | 2026-10-20 | 40 min (bonus, evening) | Two providers (`local` 2.9.1 + `random` 3.9.1); `random_pet` → `local_file` implicit dependency; variable `greeting` + 2 outputs; idempotency ("No changes"); `-var` triggers `-/+` replacement (`# forces replacement`); variable precedence experiment (tfvars / `TF_VAR_` / `-var`) | `02-random-local/` |
 | 3 | 2026-10-20 | 30 min (bonus, evening) | State refactoring: `moved` block (rename `local_file.hello` → `greeting` with 0 to add/destroy); drift (file edited by hand → `local_file` seen as deleted → `+ create`); `removed` block with `destroy = false` (object kept on disk, dropped from state, "Removed resource still exists" error when the resource block is still there) | `03-state-refactor/` |
 | 4 | 2026-10-21 | 60 min | `map(object)` variable; `for_each` (addresses `local_file.service["fhir"]`); `for` expression with `if` filter in `locals`; data source `local_file` reading a hand-made file; functions `join`, `trimspace`, `length`; `count` vs `for_each` experiment (removing a middle item shifts `count` indexes); `$( )` is bash, HCL interpolation is `${ }` | `04-collections/` |
+| 5 | 2026-10-23 | 2 h (day off) | New in 004: `depends_on` (hidden dependency), `create_before_destroy` (`-/+` → `+/-`, "deposed object"), `prevent_destroy` (blocks the whole run), `ignore_changes`; variable `validation`, `precondition`, `postcondition` with `self`, `check` block (warning only); `sensitive` variable/output (hidden in CLI, plain text in state and with `output -raw`); ephemeral `random_password` (opened/closed each run, never in state, rejected in `content`: not a write-only attribute) | `05-lifecycle/` |
 
 ## Quiz log
 
@@ -21,6 +22,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 5 | 2026-10-23 | 4/5 | Q3 a failing `check` assertion = warning, apply continues (and Terraform never rolls back) |
 | 4 | 2026-10-21 | 3/5 | Q2 unordered unique values = `set` (not `map`) · Q3 `count`: removing a middle item → `[1]` replaced + `[2]` destroyed, `[0]` untouched (not "all recreated") |
 
 ## Exam objectives — status
@@ -30,7 +32,7 @@
 | 1 | Infrastructure as Code (IaC) with Terraform | 🟨 Seen (concepts known from Ansible/DevOps) |
 | 2 | Terraform fundamentals | 🟨 Seen (session 1) |
 | 3 | Core Terraform workflow | 🟨 Seen (session 1) |
-| 4 | Terraform configuration | 🟨 Seen (sessions 2 & 4: 4a–4e; 4f–4h still to do) |
+| 4 | Terraform configuration | 🟨 Seen (sessions 2, 4, 5: all of 4a–4h practiced) |
 | 5 | Terraform modules | ⬜ To do |
 | 6 | Terraform state management | 🟨 Seen (session 3: 6a, 6d) |
 | 7 | Maintain infrastructure with Terraform | ⬜ To do |
@@ -48,6 +50,8 @@
 - **Resource type = provider local name + `_` + type** (session 1): wrote `resource "local"` instead of `resource "local_file"` → caught by `validate`.
 - **Saved plans:** `terraform plan -out=tfplan` then `terraform apply tfplan` applies exactly that plan, with no prompt.
 - **`terraform fmt`** only formats the current directory; use `-recursive` for subfolders.
+- **Custom conditions** (missed in quiz 5, Q3, after seeing it live): `validation`, `precondition`, `postcondition` → **error**, the run stops · `check` → **warning**, the run continues. And Terraform **never** rolls back.
+- **Sensitive vs ephemeral** (session 5): `sensitive` hides in CLI output only (state, `output -raw`, `output -json` show plain text) · `ephemeral` is never stored (plan or state) and only fits write-only arguments (`*_wo` + `*_wo_version`), provider blocks, other ephemeral values.
 - **Types** (missed in quiz 4, Q2): `list` = ordered, index from 0, duplicates OK · `map` = `{ key = value }`, string keys · `set` = unordered, unique values, no index, no keys · `object` = named attributes with their own types · `tuple` = ordered positions with their own types.
 - **`count` vs `for_each`** (missed in quiz 4, Q3, right after doing the experiment): `count` identifies instances by position → removing a middle item shifts the following indexes (replace + destroy), earlier ones untouched. `for_each` identifies by key → only the removed key is destroyed.
 - **Interpolation** (session 4): `${ }` only inside quotes; never `$( )` (bash) and never `${ }` nested inside `${ }`. A bare expression needs no quotes. `validate` doesn't catch it: `$(` is just text.
@@ -87,9 +91,9 @@
 - [x] 4c Use variables and outputs
 - [x] 4d Understand and use complex types
 - [x] 4e Write dynamic configuration using expressions and functions
-- [ ] 4f Define resource dependencies in configuration (`depends_on`, `create_before_destroy`) — *new in 004*
-- [ ] 4g Validate configuration using custom conditions — *new in 004*
-- [ ] 4h Best practices for sensitive data, incl. secrets management with Vault (ephemeral values, write-only arguments) — *new in 004*
+- [x] 4f Define resource dependencies in configuration (`depends_on`, `create_before_destroy`) — *new in 004*
+- [x] 4g Validate configuration using custom conditions — *new in 004*
+- [x] 4h Best practices for sensitive data, incl. secrets management with Vault (ephemeral values, write-only arguments) — *new in 004*
 
 ### 5. Terraform modules
 - [ ] 5a Explain how Terraform sources modules
