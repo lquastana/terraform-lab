@@ -24,6 +24,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| Drill 1 | 2026-10-25 | 7/10 | Mixed exam drill, domains 1–7. Q3 `count`: removing the **first** item → `[0]`, `[1]` replaced + `[2]` destroyed · Q6 precedence env < tfvars < auto.tfvars < `-var` · Q7 `version` only for registry sources (public + private), never Git/HTTP/local |
 | 7 | 2026-10-25 | 5/5 | — (asked for a detailed explanation of import blocks vs `terraform import`) |
 | 6b | 2026-10-23 | 5/5 | — (re-quiz on modules right after the explanations; incl. private registry `app.terraform.io/acme/app/azurerm` accepts `version`) |
 | 6 | 2026-10-23 | 1/5 | Q2 registry source = `<NAMESPACE>/<NAME>/<PROVIDER>` · Q3 parent reads `module.<call>.<output>` only · Q4 Git module pinned with `?ref=<tag>`, not `version` · Q5 child variable without default not set → error (end of a 2 h block: fatigue) |
@@ -61,14 +62,14 @@
 - **Custom conditions** (missed in quiz 5, Q3, after seeing it live): `validation`, `precondition`, `postcondition` → **error**, the run stops · `check` → **warning**, the run continues. And Terraform **never** rolls back.
 - **Sensitive vs ephemeral** (session 5): `sensitive` hides in CLI output only (state, `output -raw`, `output -json` show plain text) · `ephemeral` is never stored (plan or state) and only fits write-only arguments (`*_wo` + `*_wo_version`), provider blocks, other ephemeral values.
 - **Types** (missed in quiz 4, Q2): `list` = ordered, index from 0, duplicates OK · `map` = `{ key = value }`, string keys · `set` = unordered, unique values, no index, no keys · `object` = named attributes with their own types · `tuple` = ordered positions with their own types.
-- **`count` vs `for_each`** (missed in quiz 4, Q3, right after doing the experiment): `count` identifies instances by position → removing a middle item shifts the following indexes (replace + destroy), earlier ones untouched. `for_each` identifies by key → only the removed key is destroyed.
+- **`count` vs `for_each`** — ⚠️ TRAP #1, missed 3 times (quiz 4 Q3, drill 1 Q3). Everything **after** the removed position shifts (replaced), the last index is destroyed, everything **before** stays: `count` identifies instances by position → removing a middle item shifts the following indexes (replace + destroy), earlier ones untouched. `for_each` identifies by key → only the removed key is destroyed.
 - **Interpolation** (session 4): `${ }` only inside quotes; never `$( )` (bash) and never `${ }` nested inside `${ }`. A bare expression needs no quotes. `validate` doesn't catch it: `$(` is just text.
 - **Drift: two paths** (missed in quiz 3, Q4): `terraform apply` = revert reality to the code; `terraform plan/apply -refresh-only` = accept reality into the state, infra untouched. `terraform refresh` is deprecated; `-refresh=false` skips the refresh (the opposite).
 - **`init` is not needed before every apply** (session 3): only after adding/changing a provider, a module or the backend.
 - **Variables in, outputs out** (missed in quiz 2, Q4): `variable` = input (parameter), `output` = return value (shown after apply, read by a parent as `module.<name>.<output>`), `locals` = internal, `data` = read from outside.
 - **Plan display order ≠ execution order** (session 2): the plan lists resources alphabetically; execution follows the dependency graph (`random_pet` was created before `local_file`).
 - **`-var` is not remembered** (session 2): each run without `-var` falls back to tfvars / default.
-- **Variable precedence**, lowest → highest: `TF_VAR_` env vars < `terraform.tfvars` < `terraform.tfvars.json` < `*.auto.tfvars` (lexical order) < `-var` / `-var-file` on the CLI (last one wins).
+- **Variable precedence** (missed in drill 1, Q6 — "from the most distant to the closest to your command"), lowest → highest: `TF_VAR_` env vars < `terraform.tfvars` < `terraform.tfvars.json` < `*.auto.tfvars` (lexical order) < `-var` / `-var-file` on the CLI (last one wins).
 - **State holds secrets in plain text**, even attributes marked sensitive → never commit it, use a remote backend with encryption and access control. **Missed in quiz 1 (Q4).** `sensitive = true` only hides the value in CLI output (plan/apply), not in the state file.
 
 ## Sub-objectives checklist
