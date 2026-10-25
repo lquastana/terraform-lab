@@ -15,6 +15,7 @@
 | 4 | 2026-10-21 | 60 min | `map(object)` variable; `for_each` (addresses `local_file.service["fhir"]`); `for` expression with `if` filter in `locals`; data source `local_file` reading a hand-made file; functions `join`, `trimspace`, `length`; `count` vs `for_each` experiment (removing a middle item shifts `count` indexes); `$( )` is bash, HCL interpolation is `${ }` | `04-collections/` |
 | 5 | 2026-10-23 | 2 h (day off) | New in 004: `depends_on` (hidden dependency), `create_before_destroy` (`-/+` → `+/-`, "deposed object"), `prevent_destroy` (blocks the whole run), `ignore_changes`; variable `validation`, `precondition`, `postcondition` with `self`, `check` block (warning only); `sensitive` variable/output (hidden in CLI, plain text in state and with `output -raw`); ephemeral `random_password` (opened/closed each run, never in state, rejected in `content`: not a write-only attribute) | `05-lifecycle/` |
 | 6 | 2026-10-23 | 25 min (day off, after session 5) | First child module `modules/service-file` (variables / main / outputs, heredoc content, `path.root`), called twice from the root; module addresses `module.fhir.local_file.this`; traps: parent can't read child resources (only outputs), `version` only for registry modules | `06-modules/` |
+| 7 | 2026-10-25 | 40 min | Module pulled from GitHub (`git::…//06-modules/modules/service-file?ref=service-file-v1.0.0`), tags `v1.0.0` / `v1.1.0`, `for_each` on a module (`module.service["fhir"]…`), downloaded once per module block, "Module source has changed" → `init`; import block + `plan -generate-config-out` (random_string), old `terraform import` (needs the resource block first); state CLI (`state list/show`, `show`, `output -json`, `state pull`, `providers`); `TF_LOG` DEBUG (208 lines) vs TRACE (2,373), `TF_LOG_PATH` alone = no log, `TF_LOG_PROVIDER` | `07-modules-advanced/` |
 
 ## Quiz log
 
@@ -23,6 +24,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 7 | 2026-10-25 | 5/5 | — (asked for a detailed explanation of import blocks vs `terraform import`) |
 | 6b | 2026-10-23 | 5/5 | — (re-quiz on modules right after the explanations; incl. private registry `app.terraform.io/acme/app/azurerm` accepts `version`) |
 | 6 | 2026-10-23 | 1/5 | Q2 registry source = `<NAMESPACE>/<NAME>/<PROVIDER>` · Q3 parent reads `module.<call>.<output>` only · Q4 Git module pinned with `?ref=<tag>`, not `version` · Q5 child variable without default not set → error (end of a 2 h block: fatigue) |
 | 5 | 2026-10-23 | 4/5 | Q3 a failing `check` assertion = warning, apply continues (and Terraform never rolls back) |
@@ -36,9 +38,9 @@
 | 2 | Terraform fundamentals | 🟨 Seen (session 1) |
 | 3 | Core Terraform workflow | 🟨 Seen (session 1) |
 | 4 | Terraform configuration | 🟨 Seen (sessions 2, 4, 5: all of 4a–4h practiced) |
-| 5 | Terraform modules | 🟨 Seen (session 6: quiz 1/5, re-quiz 5/5; next: `for_each` on modules, Git source with `?ref`) |
+| 5 | Terraform modules | 🟨 Seen (sessions 6–7: local + Git `?ref` + `for_each`; quizzes 1/5 → 5/5 → 5/5) |
 | 6 | Terraform state management | 🟨 Seen (session 3: 6a, 6d) |
-| 7 | Maintain infrastructure with Terraform | ⬜ To do |
+| 7 | Maintain infrastructure with Terraform | 🟨 Seen (session 7: 7a–7c) |
 | 8 | HCP Terraform | ⬜ To do |
 
 ## To review
@@ -53,6 +55,8 @@
 - **Resource type = provider local name + `_` + type** (session 1): wrote `resource "local"` instead of `resource "local_file"` → caught by `validate`.
 - **Saved plans:** `terraform plan -out=tfplan` then `terraform apply tfplan` applies exactly that plan, with no prompt.
 - **`terraform fmt`** only formats the current directory; use `-recursive` for subfolders.
+- **Import, two ways** (session 7): `import { to = <address>, id = "<real id>" }` → shown in the plan, `plan -generate-config-out=<new file>` writes the resource block (never overwrites a file), several at once, works in CI/HCP · `terraform import <address> <id>` → resource block required first, writes the state immediately, no plan, one at a time, no code generated. After any import: `plan` must say "No changes".
+- **`TF_LOG` levels** (session 7, Q3 wrong before the quiz): `TRACE` > `DEBUG` > `INFO` > `WARN` > `ERROR` ("To Debug, Inspect Warnings and Errors"); `JSON` = TRACE in JSON format; `TF_LOG_PATH` alone writes nothing; logs go to stderr; `TF_LOG_CORE` / `TF_LOG_PROVIDER` split them.
 - **Modules — all of it** (quiz 6: 1/5): sources = local `./` or `../` (no version) · public registry `<NAMESPACE>/<NAME>/<PROVIDER>` (e.g. `terraform-aws-modules/vpc/aws`) + `version` · private registry `<HOST>/<ORG>/<NAME>/<PROVIDER>` · Git `git::…?ref=<tag>` · the parent sees a module **only through its outputs** (`module.<call>.<output>`) · a child variable without default is **required** → error if the module block doesn't set it (the parent's variables are never inherited).
 - **Custom conditions** (missed in quiz 5, Q3, after seeing it live): `validation`, `precondition`, `postcondition` → **error**, the run stops · `check` → **warning**, the run continues. And Terraform **never** rolls back.
 - **Sensitive vs ephemeral** (session 5): `sensitive` hides in CLI output only (state, `output -raw`, `output -json` show plain text) · `ephemeral` is never stored (plan or state) and only fits write-only arguments (`*_wo` + `*_wo_version`), provider blocks, other ephemeral values.
@@ -103,7 +107,7 @@
 - [x] 5a Explain how Terraform sources modules
 - [x] 5b Describe variable scope within modules
 - [x] 5c Use modules in configuration
-- [ ] 5d Manage module versions
+- [x] 5d Manage module versions
 
 ### 6. Terraform state management
 - [x] 6a Describe the local backend
@@ -112,9 +116,9 @@
 - [x] 6d Manage resource drift and Terraform state (refresh-only, `moved`, `removed`)
 
 ### 7. Maintain infrastructure with Terraform
-- [ ] 7a Import existing infrastructure into your Terraform workspace
+- [x] 7a Import existing infrastructure into your Terraform workspace
 - [x] 7b Use the CLI to inspect state
-- [ ] 7c Describe when and how to use verbose logging
+- [x] 7c Describe when and how to use verbose logging
 
 ### 8. HCP Terraform
 - [ ] 8a Use HCP Terraform to create infrastructure
