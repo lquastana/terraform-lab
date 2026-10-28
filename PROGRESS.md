@@ -16,6 +16,7 @@
 | 5 | 2026-10-23 | 2 h (day off) | New in 004: `depends_on` (hidden dependency), `create_before_destroy` (`-/+` → `+/-`, "deposed object"), `prevent_destroy` (blocks the whole run), `ignore_changes`; variable `validation`, `precondition`, `postcondition` with `self`, `check` block (warning only); `sensitive` variable/output (hidden in CLI, plain text in state and with `output -raw`); ephemeral `random_password` (opened/closed each run, never in state, rejected in `content`: not a write-only attribute) | `05-lifecycle/` |
 | 6 | 2026-10-23 | 25 min (day off, after session 5) | First child module `modules/service-file` (variables / main / outputs, heredoc content, `path.root`), called twice from the root; module addresses `module.fhir.local_file.this`; traps: parent can't read child resources (only outputs), `version` only for registry modules | `06-modules/` |
 | 7 | 2026-10-25 | 40 min | Module pulled from GitHub (`git::…//06-modules/modules/service-file?ref=service-file-v1.0.0`), tags `v1.0.0` / `v1.1.0`, `for_each` on a module (`module.service["fhir"]…`), downloaded once per module block, "Module source has changed" → `init`; import block + `plan -generate-config-out` (random_string), old `terraform import` (needs the resource block first); state CLI (`state list/show`, `show`, `output -json`, `state pull`, `providers`); `TF_LOG` DEBUG (208 lines) vs TRACE (2,373), `TF_LOG_PATH` alone = no log, `TF_LOG_PROVIDER` | `07-modules-advanced/` |
+| 8 | 2026-10-28 | 35 min (+ drill 2) | `backend "local" { path }` + `init -migrate-state` (state copied, "No changes" after); "Variables not allowed" in backend → partial configuration `-backend-config="path=…"`; state locking live with 2 terminals (`.partial.tfstate.lock.info`, "Error acquiring the state lock", `-lock-timeout`); CLI workspaces (`terraform.tfstate.d/dev/`, `default` can't be deleted, non-empty workspace can't be deleted) | `08-backends/` |
 
 ## Quiz log
 
@@ -24,6 +25,8 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 8 | 2026-10-28 | 5/5 | — (locking, force-unlock, partial backend config, `-migrate-state` vs `-reconfigure`, workspace state path) |
+| Drill 2 | 2026-10-28 | 8/10 | Q1 `count`: removing the **last** item → only `[2]` destroyed (4th miss on `count`) · Q2 precedence: `*.auto.tfvars` beats `terraform.tfvars` beats `TF_VAR_` (2nd miss) |
 | Drill 1 | 2026-10-25 | 7/10 | Mixed exam drill, domains 1–7. Q3 `count`: removing the **first** item → `[0]`, `[1]` replaced + `[2]` destroyed · Q6 precedence env < tfvars < auto.tfvars < `-var` · Q7 `version` only for registry sources (public + private), never Git/HTTP/local |
 | 7 | 2026-10-25 | 5/5 | — (asked for a detailed explanation of import blocks vs `terraform import`) |
 | 6b | 2026-10-23 | 5/5 | — (re-quiz on modules right after the explanations; incl. private registry `app.terraform.io/acme/app/azurerm` accepts `version`) |
@@ -40,7 +43,7 @@
 | 3 | Core Terraform workflow | 🟨 Seen (session 1) |
 | 4 | Terraform configuration | 🟨 Seen (sessions 2, 4, 5: all of 4a–4h practiced) |
 | 5 | Terraform modules | 🟨 Seen (sessions 6–7: local + Git `?ref` + `for_each`; quizzes 1/5 → 5/5 → 5/5) |
-| 6 | Terraform state management | 🟨 Seen (session 3: 6a, 6d) |
+| 6 | Terraform state management | 🟨 Seen (sessions 3 & 8: 6a–6d all practiced; quiz 8 5/5) |
 | 7 | Maintain infrastructure with Terraform | 🟨 Seen (session 7: 7a–7c) |
 | 8 | HCP Terraform | ⬜ To do |
 
@@ -62,7 +65,7 @@
 - **Custom conditions** (missed in quiz 5, Q3, after seeing it live): `validation`, `precondition`, `postcondition` → **error**, the run stops · `check` → **warning**, the run continues. And Terraform **never** rolls back.
 - **Sensitive vs ephemeral** (session 5): `sensitive` hides in CLI output only (state, `output -raw`, `output -json` show plain text) · `ephemeral` is never stored (plan or state) and only fits write-only arguments (`*_wo` + `*_wo_version`), provider blocks, other ephemeral values.
 - **Types** (missed in quiz 4, Q2): `list` = ordered, index from 0, duplicates OK · `map` = `{ key = value }`, string keys · `set` = unordered, unique values, no index, no keys · `object` = named attributes with their own types · `tuple` = ordered positions with their own types.
-- **`count` vs `for_each`** — ⚠️ TRAP #1, missed 3 times (quiz 4 Q3, drill 1 Q3). Everything **after** the removed position shifts (replaced), the last index is destroyed, everything **before** stays: `count` identifies instances by position → removing a middle item shifts the following indexes (replace + destroy), earlier ones untouched. `for_each` identifies by key → only the removed key is destroyed.
+- **`count` vs `for_each`** — ⚠️ TRAP #1, missed 4 times (quiz 4 Q3, drills 1 & 2). Picture **numbered seats**: when someone leaves, only the people **behind** them move up. Remove the last → only `[last]` destroyed. Everything **after** the removed position shifts (replaced), the last index is destroyed, everything **before** stays: `count` identifies instances by position → removing a middle item shifts the following indexes (replace + destroy), earlier ones untouched. `for_each` identifies by key → only the removed key is destroyed.
 - **Interpolation** (session 4): `${ }` only inside quotes; never `$( )` (bash) and never `${ }` nested inside `${ }`. A bare expression needs no quotes. `validate` doesn't catch it: `$(` is just text.
 - **Drift: two paths** (missed in quiz 3, Q4): `terraform apply` = revert reality to the code; `terraform plan/apply -refresh-only` = accept reality into the state, infra untouched. `terraform refresh` is deprecated; `-refresh=false` skips the refresh (the opposite).
 - **`init` is not needed before every apply** (session 3): only after adding/changing a provider, a module or the backend.
@@ -112,8 +115,8 @@
 
 ### 6. Terraform state management
 - [x] 6a Describe the local backend
-- [ ] 6b Describe state locking
-- [ ] 6c Configure remote state using the backend block
+- [x] 6b Describe state locking
+- [x] 6c Configure remote state using the backend block (local backend with `path`, partial config, `-migrate-state`; a real remote backend still to see in HCP)
 - [x] 6d Manage resource drift and Terraform state (refresh-only, `moved`, `removed`)
 
 ### 7. Maintain infrastructure with Terraform
