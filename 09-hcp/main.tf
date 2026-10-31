@@ -27,7 +27,7 @@ variable "greeting" {
 }
 
 resource "random_pet" "pet" {
-  length    = 2
+  length    = 3
   separator = "-"
 }
 
