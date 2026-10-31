@@ -18,6 +18,7 @@
 | 7 | 2026-10-25 | 40 min | Module pulled from GitHub (`git::…//06-modules/modules/service-file?ref=service-file-v1.0.0`), tags `v1.0.0` / `v1.1.0`, `for_each` on a module (`module.service["fhir"]…`), downloaded once per module block, "Module source has changed" → `init`; import block + `plan -generate-config-out` (random_string), old `terraform import` (needs the resource block first); state CLI (`state list/show`, `show`, `output -json`, `state pull`, `providers`); `TF_LOG` DEBUG (208 lines) vs TRACE (2,373), `TF_LOG_PATH` alone = no log, `TF_LOG_PROVIDER` | `07-modules-advanced/` |
 | 8 | 2026-10-28 | 35 min (+ drill 2) | `backend "local" { path }` + `init -migrate-state` (state copied, "No changes" after); "Variables not allowed" in backend → partial configuration `-backend-config="path=…"`; state locking live with 2 terminals (`.partial.tfstate.lock.info`, "Error acquiring the state lock", `-lock-timeout`); CLI workspaces (`terraform.tfstate.d/dev/`, `default` can't be deleted, non-empty workspace can't be deleted) | `08-backends/` |
 | 9 | 2026-10-29 | 1 h (bonus, afternoon) | HCP Terraform: free account + organization `lquastana-lab`; `terraform login` (token in `~/.terraform.d/credentials.tfrc.json`); `cloud` block → workspace `terraform-lab` created by `init` (CLI-driven workflow); remote run streamed to the terminal; `local_file` written on the ephemeral worker, not locally (Remote execution mode); state stored in HCP; workspace Terraform variable `greeting = Bonjour` overrides the default | `09-hcp/` |
+| 10 | 2026-10-31 | 1 h (bonus, Saturday) | VCS-driven workflow: project `terraform-lab`, variable set `lab-common` (`env = lab`) scoped to the project, workspace `terraform-lab` connected to GitHub (working directory `10-vcs`, trigger only on that path — proven when a change to `09-hcp/` started no run), no `cloud` block needed; PR #2 → speculative plan as a GitHub check, merge to `main` → automatic run; CLI `apply` refused on a VCS workspace | `10-vcs/` |
 
 ## Quiz log
 
@@ -26,6 +27,8 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 10 | 2026-10-31 | 5/5 | — (VCS apply refused, speculative plan, policies between plan and apply, variable sets, workspace beats variable set) |
+| Drill 4 | 2026-10-31 | 7/8 | Q8 the lock file records provider versions + checksums, **not** module versions. All the other traps right (count, for_each, precedence, migrate-state, TF_LOG, refresh-only) — after the TRAPS episodes |
 | 9 | 2026-10-29 | 5/5 | — (terraform login, remote worker, `cloud` block, Local execution mode, sensitive = write-only) |
 | Drill 3 | 2026-10-29 | 3/6 | Q1 `for_each`: removing `"a"` destroys only `["a"]` · Q3 `-var` always wins · Q6 `-reconfigure` doesn't copy the state (`-migrate-state` does). Answers flip from one day to the next → write a traps sheet |
 | 8 | 2026-10-28 | 5/5 | — (locking, force-unlock, partial backend config, `-migrate-state` vs `-reconfigure`, workspace state path) |
@@ -48,7 +51,7 @@
 | 5 | Terraform modules | 🟨 Seen (sessions 6–7: local + Git `?ref` + `for_each`; quizzes 1/5 → 5/5 → 5/5) |
 | 6 | Terraform state management | 🟨 Seen (sessions 3 & 8: 6a–6d all practiced; quiz 8 5/5) |
 | 7 | Maintain infrastructure with Terraform | 🟨 Seen (session 7: 7a–7c) |
-| 8 | HCP Terraform | 🟨 Seen (session 9: 8a, 8d; 8b–8c to do: VCS workflow, projects, variable sets, run triggers, policies) |
+| 8 | HCP Terraform | 🟨 Seen (sessions 9–10: 8a, 8c, 8d practiced; 8b policies / teams / run triggers in theory only) |
 
 ## To review
 
@@ -130,7 +133,7 @@
 ### 8. HCP Terraform
 - [x] 8a Use HCP Terraform to create infrastructure
 - [ ] 8b Describe HCP Terraform collaboration and governance features
-- [ ] 8c Describe how to organize and use HCP Terraform workspaces and projects — *new in 004*
+- [x] 8c Describe how to organize and use HCP Terraform workspaces and projects — *new in 004*
 - [x] 8d Configure and use HCP Terraform integration
 
 Source: [Exam Content List – Terraform Associate 004](https://developer.hashicorp.com/terraform/tutorials/certification-004/associate-review-004)
