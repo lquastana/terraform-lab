@@ -15,7 +15,7 @@ variable "env" {
 
 resource random_pet app {
   prefix    = var.env
-  length    = 2
+  length    = 3
   separator = "-"
 }
 
