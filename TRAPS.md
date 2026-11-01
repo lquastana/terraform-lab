@@ -156,6 +156,20 @@ Both update the **state** to match **reality**, **without changing the infrastru
 
 ---
 
+## 11. "Which command / block does X?" (mock exam 1: 5 misses out of 5 here)
+
+| I want to… | Answer | Not… |
+|---|---|---|
+| Preview changes **and save** the plan | `terraform plan -out=tfplan` (then `terraform apply tfplan`) | `validate` (syntax only), `show` (displays a state or a saved plan) |
+| Check formatting **in CI** without changing files | `terraform fmt -check` → **non-zero exit code** + lists the files | it never runs `validate`, never rewrites files |
+| **Read** an existing object without managing it | a **`data`** block → `data.<type>.<name>.<attr>` | `output` (exposes a value **out** of a module) |
+| **Generate the code** for `import` blocks | `terraform plan -generate-config-out=generated.tf` | `state pull` (prints the raw state JSON) |
+| **List** every resource in the state | `terraform state list` | `show` (whole state, detailed), `output`, `providers` |
+
+> Read every option to the end: on these questions, the wrong answers are **real commands** that do something else.
+
+---
+
 ## Bonus: quick traps
 
 - **`~>` lets only the rightmost number move:** `~> 2.5` = `>= 2.5, < 3.0` · `~> 2.5.0` = `>= 2.5.0, < 2.6.0` · `>= 2.5` has **no upper limit**.

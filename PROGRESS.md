@@ -40,6 +40,12 @@
 | 5 | 2026-10-23 | 4/5 | Q3 a failing `check` assertion = warning, apply continues (and Terraform never rolls back) |
 | 4 | 2026-10-21 | 3/5 | Q2 unordered unique values = `set` (not `map`) · Q3 `count`: removing a middle item → `[1]` replaced + `[2]` destroyed, `[0]` untouched (not "all recreated") |
 
+## Mock exams
+
+| # | Date | Questions / time | Score | By domain | Missed |
+|---|------|------------------|-------|-----------|--------|
+| 1 | 2026-11-01 | 30 Q / 30 min (finished in ~19 min) | **25/30 (83 %)** | D1 3/3 · D2 4/4 · D3 2/4 · D4 6/7 · D5 3/3 · D6 4/4 · D7 1/3 · D8 2/2 | Q9 `plan -out` · Q10 `fmt -check` · Q12 `data` block · Q26 `plan -generate-config-out` · Q28 `state list` — all "which command / block does X" questions, all practiced in labs |
+
 ## Exam objectives — status
 
 | # | Domain | Status |
