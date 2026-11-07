@@ -28,6 +28,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 11 | 2026-11-07 | 5/5 | — (stale plan, `output -raw`, `state mv` without code rename, `state rm` orphan, `cidrsubnet`) |
 | Drill 5 | 2026-11-07 | 9/10 | CLI commands drill: all 5 mock-exam misses fixed. Q10 stuck lock = `terraform force-unlock LOCK_ID` (`init -unlock` doesn't exist) |
 | 10 | 2026-10-31 | 5/5 | — (VCS apply refused, speculative plan, policies between plan and apply, variable sets, workspace beats variable set) |
 | Drill 4 | 2026-10-31 | 7/8 | Q8 the lock file records provider versions + checksums, **not** module versions. All the other traps right (count, for_each, precedence, migrate-state, TF_LOG, refresh-only) — after the TRAPS episodes |
