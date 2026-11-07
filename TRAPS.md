@@ -165,6 +165,10 @@ Both update the **state** to match **reality**, **without changing the infrastru
 | **Read** an existing object without managing it | a **`data`** block → `data.<type>.<name>.<attr>` | `output` (exposes a value **out** of a module) |
 | **Generate the code** for `import` blocks | `terraform plan -generate-config-out=generated.tf` | `state pull` (prints the raw state JSON) |
 | **List** every resource in the state | `terraform state list` | `show` (whole state, detailed), `output`, `providers` |
+| Release a **stuck** lock (after a crash) | `terraform force-unlock LOCK_ID` (ID shown in "Error acquiring the state lock") | `init -unlock` doesn't exist; `-lock=false` only skips locking |
+| Apply a saved plan **again** after the state changed | → **"Saved plan is stale"**: run `plan -out` again | a saved plan is tied to one state version |
+| Rename in the state only | `terraform state mv OLD NEW` + **rename the code too** (otherwise: destroy + create) | prefer a `moved` block |
+| Forget an object | `terraform state rm ADDRESS` + **delete the block** (otherwise it's re-created = duplicate) | it never destroys the real object |
 
 > Read every option to the end: on these questions, the wrong answers are **real commands** that do something else.
 

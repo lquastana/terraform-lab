@@ -19,6 +19,7 @@
 | 8 | 2026-10-28 | 35 min (+ drill 2) | `backend "local" { path }` + `init -migrate-state` (state copied, "No changes" after); "Variables not allowed" in backend → partial configuration `-backend-config="path=…"`; state locking live with 2 terminals (`.partial.tfstate.lock.info`, "Error acquiring the state lock", `-lock-timeout`); CLI workspaces (`terraform.tfstate.d/dev/`, `default` can't be deleted, non-empty workspace can't be deleted) | `08-backends/` |
 | 9 | 2026-10-29 | 1 h (bonus, afternoon) | HCP Terraform: free account + organization `lquastana-lab`; `terraform login` (token in `~/.terraform.d/credentials.tfrc.json`); `cloud` block → workspace `terraform-lab` created by `init` (CLI-driven workflow); remote run streamed to the terminal; `local_file` written on the ephemeral worker, not locally (Remote execution mode); state stored in HCP; workspace Terraform variable `greeting = Bonjour` overrides the default | `09-hcp/` |
 | 10 | 2026-10-31 | 1 h (bonus, Saturday) | VCS-driven workflow: project `terraform-lab`, variable set `lab-common` (`env = lab`) scoped to the project, workspace `terraform-lab` connected to GitHub (working directory `10-vcs`, trigger only on that path — proven when a change to `09-hcp/` started no run), no `cloud` block needed; PR #2 → speculative plan as a GitHub check, merge to `main` → automatic run; CLI `apply` refused on a VCS workspace | `10-vcs/` |
+| 11 | 2026-11-07 | 1 h (Saturday, local only) | CLI lab on the mock-exam misses: `fmt -check -recursive` (exit 3 → 0), `plan -out` → `show tfplan` → `apply tfplan` (no prompt) → second apply = "Saved plan is stale"; `output -json` vs `-raw`; `apply -replace` ("as requested", `-/+`); `state mv` without renaming the code = destroy + create; `state rm` = object forgotten (orphan) → remove the block too; `console` (`cidrsubnet`), `providers` | `11-cli/` |
 
 ## Quiz log
 
@@ -27,6 +28,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| Drill 5 | 2026-11-07 | 9/10 | CLI commands drill: all 5 mock-exam misses fixed. Q10 stuck lock = `terraform force-unlock LOCK_ID` (`init -unlock` doesn't exist) |
 | 10 | 2026-10-31 | 5/5 | — (VCS apply refused, speculative plan, policies between plan and apply, variable sets, workspace beats variable set) |
 | Drill 4 | 2026-10-31 | 7/8 | Q8 the lock file records provider versions + checksums, **not** module versions. All the other traps right (count, for_each, precedence, migrate-state, TF_LOG, refresh-only) — after the TRAPS episodes |
 | 9 | 2026-10-29 | 5/5 | — (terraform login, remote worker, `cloud` block, Local execution mode, sensitive = write-only) |
