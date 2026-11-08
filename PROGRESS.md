@@ -47,6 +47,7 @@
 
 | # | Date | Questions / time | Score | By domain | Missed |
 |---|------|------------------|-------|-----------|--------|
+| 2 | 2026-11-08 | 50 Q / 60 min (finished in **29 min**) | **36/50 (72 %)** | D1 4/4 · D2 3/6 · D3 7/7 · D4 6/11 · D5 5/5 · D6 6/6 · D7 1/4 · D8 4/7 | Q5 Official = HashiCorp · Q9 state purposes · Q10 `provider = aws.west` · Q18 `data.` prefix · Q21 `merge` · Q24 sensitive root output = error · Q26 `self` · Q28 `count` + `for_each` forbidden · Q40 import `to`/`id` · Q42 `terraform show` · Q43 `crash.log` · Q44 CLI-driven · Q46 soft-mandatory · Q50 speculative plans. Used half the time → rushing |
 | 1 | 2026-11-01 | 30 Q / 30 min (finished in ~19 min) | **25/30 (83 %)** | D1 3/3 · D2 4/4 · D3 2/4 · D4 6/7 · D5 3/3 · D6 4/4 · D7 1/3 · D8 2/2 | Q9 `plan -out` · Q10 `fmt -check` · Q12 `data` block · Q26 `plan -generate-config-out` · Q28 `state list` — all "which command / block does X" questions, all practiced in labs |
 
 ## Exam objectives — status

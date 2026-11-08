@@ -174,6 +174,34 @@ Both update the **state** to match **reality**, **without changing the infrastru
 
 ---
 
+## 12. Mock exam 2 misses (2026-11-08): syntax and vocabulary
+
+**Syntax (domain 4)**
+- A **data source** is always referenced with the **`data.` prefix**: `data.aws_ami.ubuntu.id`. Without `data.`, it's a managed resource.
+- **Collection functions:** `merge(map1, map2)` = maps · `concat(list1, list2)` = lists · `join(", ", list)` = list → string · `flatten([[a], [b]])` = nested lists → flat list.
+- A **root output** that uses a sensitive value **must** say `sensitive = true`, otherwise → **error** ("Output refers to sensitive values"). Never shown in plain text.
+- In a `postcondition`, the resource refers to itself with **`self`** (`self.file_permission`).
+- **`count` and `for_each` can never be used together** on the same resource or module.
+- Aliased provider: **`provider = aws.west`** (provider name + `.` + alias, no quotes).
+
+**Fundamentals (domain 2)**
+- Provider tiers: **Official = HashiCorp** · Partner = third-party companies · Community = individuals.
+- State purposes: **mapping to real objects + metadata (dependencies)**, performance, syncing. It does **not** store provider binaries (`.terraform/`) or variable declarations (the code).
+
+**Commands and files (domain 7)**
+- Import block arguments: **`to`** (the address in your code) and **`id`** (the real object's ID).
+- **`terraform show`** = the state, or a saved plan, in human-readable form.
+- A Terraform crash writes **`crash.log`**.
+
+**HCP Terraform vocabulary (domain 8)**
+- Runs started from the terminal through a `cloud` block = **CLI-driven** workflow (VCS-driven = triggered by Git).
+- Sentinel enforcement levels: **advisory** (warns) · **soft-mandatory** (can be **overridden** by authorised users) · **hard-mandatory** (must pass). "Mandatory-override" doesn't exist.
+- **Speculative plans:** can't be applied, run automatically on pull requests. They need no policy and never touch the state.
+
+> **Exam method:** I finished in 29 of 60 minutes. Use the time: **reread every question once** before sending.
+
+---
+
 ## Bonus: quick traps
 
 - **`~>` lets only the rightmost number move:** `~> 2.5` = `>= 2.5, < 3.0` · `~> 2.5.0` = `>= 2.5.0, < 2.6.0` · `>= 2.5` has **no upper limit**.
