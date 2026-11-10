@@ -20,6 +20,7 @@
 | 9 | 2026-10-29 | 1 h (bonus, afternoon) | HCP Terraform: free account + organization `lquastana-lab`; `terraform login` (token in `~/.terraform.d/credentials.tfrc.json`); `cloud` block → workspace `terraform-lab` created by `init` (CLI-driven workflow); remote run streamed to the terminal; `local_file` written on the ephemeral worker, not locally (Remote execution mode); state stored in HCP; workspace Terraform variable `greeting = Bonjour` overrides the default | `09-hcp/` |
 | 10 | 2026-10-31 | 1 h (bonus, Saturday) | VCS-driven workflow: project `terraform-lab`, variable set `lab-common` (`env = lab`) scoped to the project, workspace `terraform-lab` connected to GitHub (working directory `10-vcs`, trigger only on that path — proven when a change to `09-hcp/` started no run), no `cloud` block needed; PR #2 → speculative plan as a GitHub check, merge to `main` → automatic run; CLI `apply` refused on a VCS workspace | `10-vcs/` |
 | 11 | 2026-11-07 | 1 h (Saturday, local only) | CLI lab on the mock-exam misses: `fmt -check -recursive` (exit 3 → 0), `plan -out` → `show tfplan` → `apply tfplan` (no prompt) → second apply = "Saved plan is stale"; `output -json` vs `-raw`; `apply -replace` ("as requested", `-/+`); `state mv` without renaming the code = destroy + create; `state rm` = object forgotten (orphan) → remove the block too; `console` (`cidrsubnet`), `providers` | `11-cli/` |
+| 12 | 2026-11-10 | 1 h (Tuesday evening) | Syntax lab on the mock exam 2 misses: "Reference to undeclared resource" without `data.`; console: `merge` (last map wins), `concat`, `join` / `split`, `flatten`, `lookup`, `toset` (dedup); `dynamic "source"` in `data.archive_file` (3 generated blocks, iterator = block name); `postcondition` with `self`; sensitive variable → root output must be `sensitive = true`; `count` + `for_each` → "Invalid combination" | `12-syntax/` |
 
 ## Quiz log
 
@@ -28,6 +29,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| 12 | 2026-11-10 | 4/5 | Q3 inside `dynamic "ingress"`, the iterator is **`ingress`** (`ingress.value`), not `each` — even right after the warning |
 | 11 | 2026-11-07 | 5/5 | — (stale plan, `output -raw`, `state mv` without code rename, `state rm` orphan, `cidrsubnet`) |
 | Drill 5 | 2026-11-07 | 9/10 | CLI commands drill: all 5 mock-exam misses fixed. Q10 stuck lock = `terraform force-unlock LOCK_ID` (`init -unlock` doesn't exist) |
 | 10 | 2026-10-31 | 5/5 | — (VCS apply refused, speculative plan, policies between plan and apply, variable sets, workspace beats variable set) |

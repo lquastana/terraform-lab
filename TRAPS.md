@@ -183,6 +183,8 @@ Both update the **state** to match **reality**, **without changing the infrastru
 - In a `postcondition`, the resource refers to itself with **`self`** (`self.file_permission`).
 - **`count` and `for_each` can never be used together** on the same resource or module.
 - Aliased provider: **`provider = aws.west`** (provider name + `.` + alias, no quotes).
+- **`dynamic` blocks:** the iterator takes the **block's name**: in `dynamic "ingress"`, write `ingress.key` / `ingress.value` — **never `each`** (that's for `for_each` on resources and modules). Rename it with `iterator = rule` → `rule.value`. (Missed in quiz 12.)
+- `merge`: if two maps share a key, the **last** map wins.
 
 **Fundamentals (domain 2)**
 - Provider tiers: **Official = HashiCorp** · Partner = third-party companies · Community = individuals.
