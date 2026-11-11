@@ -45,3 +45,6 @@ terraform.rc
 
 # Ignore saved plan files (terraform plan -out=tfplan): they can contain secrets
 *tfplan*
+
+# Generated archives (e.g. archive_file outputs)
+*.zip

@@ -200,6 +200,17 @@ Both update the **state** to match **reality**, **without changing the infrastru
 - Sentinel enforcement levels: **advisory** (warns) · **soft-mandatory** (can be **overridden** by authorised users) · **hard-mandatory** (must pass). "Mandatory-override" doesn't exist.
 - **Speculative plans:** can't be applied, run automatically on pull requests. They need no policy and never touch the state.
 
+| HCP notion | One sentence | Don't confuse with |
+|---|---|---|
+| Policies (Sentinel / OPA) | checked **after the plan, before the apply** | — |
+| **Run tasks** | plug an **external tool** (security scan, cost estimate) into a run — *tasks* given to other tools | **Run triggers** = a *trigger* that queues a run in **another workspace** |
+| **Projects** | **group workspaces** and carry their permissions | **Teams** = groups of **people** (a team gets rights on a project) |
+| Execution mode **Local** | plan/apply **on my machine**, state stored in HCP | *Speculative* = a plan that can't be applied, not an execution mode |
+
+**What the state really contains** (proved on `12-syntax/terraform.tfstate`): top-level keys `version`, `terraform_version`, `serial`, `lineage`, `outputs`, `resources`, `check_results`. **No `variables`**: `variable` blocks live in the code; their values only appear where they're used (resource attributes, outputs — in plain text, even if sensitive).
+
+> **Drill method:** answer with the **letter + 2–3 words of justification** (`9-A to/id`). In drill 6, I answered reshuffled questions with the **old letters**.
+
 > **Exam method:** I finished in 29 of 60 minutes. Use the time: **reread every question once** before sending.
 
 ---
