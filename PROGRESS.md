@@ -30,6 +30,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| Drill 7 | 2026-11-13 | 6/8 | Warm-up before mock 3, options reshuffled: state contents, import, alias, soft-mandatory, `data.`, sensitive output all right. Q4 `dynamic "setting"` → `setting.value` (2nd miss) · Q5 queue a run in another workspace = **run trigger** (2nd miss). No justifications given |
 | Drill 6b | 2026-11-11 | 6/7 | Re-drill after the explanations: run tasks, policies, projects, Local mode, import, alias all right. Q6 state contents: picked "the `variable` blocks" again (3rd time) → proved with a real `terraform.tfstate`: no `variables` key, only `outputs` + `resources` + metadata |
 | Drill 6 | 2026-11-11 | 8/15 | Q5 policies after plan · Q6 run **tasks** ≠ run triggers · Q7 **projects** group workspaces (teams = people) · Q8 **Local** execution mode · Q9 import `to`/`id` · Q14 state purposes · Q15 `provider = azurerm.west`. Q9 and Q14 = mock exam 2 questions reshuffled, answered with **the old letters** → answer with letter + justification from now on |
 | 12 | 2026-11-10 | 4/5 | Q3 inside `dynamic "ingress"`, the iterator is **`ingress`** (`ingress.value`), not `each` — even right after the warning |
