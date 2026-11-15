@@ -209,6 +209,26 @@ Both update the **state** to match **reality**, **without changing the infrastru
 
 **What the state really contains** (proved on `12-syntax/terraform.tfstate`): top-level keys `version`, `terraform_version`, `serial`, `lineage`, `outputs`, `resources`, `check_results`. **No `variables`**: `variable` blocks live in the code; their values only appear where they're used (resource attributes, outputs — in plain text, even if sensitive).
 
+**The state's 4 roles, seen in `13-state/` (2026-11-15)**
+
+| Role | What proves it |
+|---|---|
+| **Mapping** | `random_pet.app → id leading-longhorn`; a block deleted from the code → *"will be destroyed (because … is not in configuration)"*: the state remembers what the code forgot |
+| **Metadata** | `"dependencies": ["random_pet.app"]` → replacing the pet also replaced the file |
+| **Performance (cache)** | `plan -refresh=false` trusts the state only and **misses drift**; `plan` refreshes first |
+| **Syncing** | `serial` = +1 at **every state write** (3 → 8 during one replace); `lineage` = the state's identity, never changes; locking |
+
+**Mock exam 3 new misses (2026-11-15)**
+- Idempotency = same configuration applied twice → the second time, **"No changes"**.
+- Several `provider` blocks: resources use the one **without `alias`** by default.
+- `terraform apply` (no saved plan) = new plan + confirmation. It **never upgrades providers** — only `init -upgrade` does.
+- Number of elements: **`length()`**. There is no `size()`.
+- Ephemeral values go **only** into a **provider block** or a **write-only argument** (both, in "choose two").
+- `init -reconfigure` onto an empty backend → the next plan wants to **create everything** (no migration: that's `-migrate-state`).
+- `TF_LOG` alone → logs on **stderr** (the terminal). No error.
+- Rights on many workspaces at once → put them in a **project** (a *policy set* is a group of policies).
+- VCS-connected workspace + `terraform apply` from the CLI → **error**.
+
 > **Drill method:** answer with the **letter + 2–3 words of justification** (`9-A to/id`). In drill 6, I answered reshuffled questions with the **old letters**.
 
 > **Exam method:** I finished in 29 of 60 minutes. Use the time: **reread every question once** before sending.
