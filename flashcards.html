@@ -135,8 +135,8 @@ footer { color: var(--muted); font-size: 13px; padding-block: 0 40px; }
   <div class="wrap">
     <div class="eyebrow">Terraform Associate 004 · <span lang="fr">examen semaine du 15/12/2026</span><span lang="en">exam week of 15 Dec 2026</span></div>
     <h1>Terraform Trap Cards</h1>
-    <p class="lede" lang="fr">Les 18 pièges sur lesquels je suis déjà tombé, et seulement eux. Chaque carte vient d'une vraie erreur notée dans PROGRESS.md.</p>
-    <p class="lede" lang="en">The 18 traps I have already fallen into, and nothing else. Every card comes from a real miss logged in PROGRESS.md.</p>
+    <p class="lede" lang="fr">Les 19 pièges sur lesquels je suis déjà tombé, et seulement eux. Chaque carte vient d'une vraie erreur notée dans PROGRESS.md.</p>
+    <p class="lede" lang="en">The 19 traps I have already fallen into, and nothing else. Every card comes from a real miss logged in PROGRESS.md.</p>
   </div>
 </header>
 
@@ -683,6 +683,40 @@ resource "aws_s3_bucket" "logs" {
   provider = aws.west                                     # name.alias, no quotes
   bucket   = "acme-logs"
 }</code></pre>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 19 -->
+    <article class="card" data-id="19">
+      <div class="head">
+        <span class="num">19</span>
+        <h2 class="q"><span lang="fr">Les scénarios du state : bloc supprimé, state perdu, <code>state rm</code>, <code>list</code> ou <code>show</code> ?</span><span lang="en">State scenarios: block deleted, state lost, <code>state rm</code>, <code>list</code> or <code>show</code>?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">nouveau, 16/11</span><span lang="en">new, 16 Nov</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a19"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a19" hidden>
+        <div class="tbl"><table>
+          <thead><tr><th lang="fr">Situation</th><th lang="en">Situation</th><th lang="fr">Ce que fait Terraform</th><th lang="en">What Terraform does</th></tr></thead>
+          <tbody>
+            <tr><td lang="fr">Bloc supprimé du code, l'objet existe et il est dans le state</td><td lang="en">Block deleted from the code, object exists and is in the state</td><td lang="fr">Le plan propose de le <strong>détruire</strong> : <em>« will be destroyed (because … is not in configuration) »</em></td><td lang="en">The plan proposes to <strong>destroy</strong> it: <em>"will be destroyed (because … is not in configuration)"</em></td></tr>
+            <tr><td lang="fr">Fichier de state perdu, sans sauvegarde</td><td lang="en">State file lost, no backup</td><td lang="fr">Le plan veut <strong>tout recréer</strong> → doublons ou erreurs « already exists ». Il ne réimporte <strong>jamais</strong> rien tout seul. Remède : restaurer une sauvegarde (backend versionné) ou faire des imports.</td><td lang="en">The plan wants to <strong>create everything again</strong> → duplicates or "already exists" errors. It <strong>never</strong> re-imports anything by itself. Fix: restore a backup (versioned backend) or import.</td></tr>
+            <tr><td><code>terraform state rm ADDRESS</code></td><td lang="fr">L'objet réel <strong>continue de tourner</strong>, oublié. Si le bloc est encore dans le code, le prochain plan voudra le recréer : supprime aussi le bloc.</td><td lang="en">The real object <strong>keeps running</strong>, forgotten. If the block is still in the code, the next plan wants to create it again: delete the block too.</td></tr>
+            <tr><td><code>state list</code> / <code>state show</code></td><td lang="fr"><code>list</code> = les adresses seulement. <code>show ADDRESS</code> = tous les attributs d'une ressource.</td><td lang="en"><code>list</code> = addresses only. <code>show ADDRESS</code> = every attribute of one resource.</td></tr>
+          </tbody>
+        </table></div>
+        <pre><code data-hl>$ terraform state list
+local_file.conf
+random_pet.app
+
+$ terraform state show random_pet.app
+# random_pet.app:
+resource "random_pet" "app" {
+    id        = "leading-longhorn"
+    length    = 2
+    separator = "-"
+}</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Le code = la liste de courses. Le state = l'inventaire. Perdre le state, c'est perdre l'inventaire : le magasin recommande tout. Et <strong>list = le sommaire, show = la page</strong>.</span><span lang="en">The code = the shopping list. The state = the inventory. Losing the state means losing the inventory: the shop orders everything again. And <strong>list = the table of contents, show = the page</strong>.</span></div>
         <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
       </div>
     </article>
