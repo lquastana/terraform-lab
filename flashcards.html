@@ -1,0 +1,836 @@
+<title>Terraform Trap Cards</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: one readable column of cards under a sticky control bar; code blocks styled like a terminal. */
+:root {
+  --bg: #eef2f4;
+  --surface: #ffffff;
+  --ink: #13212c;
+  --muted: #566875;
+  --line: #d6dee4;
+  --accent: #0e7068;
+  --accent-soft: #dcefec;
+  --accent-ink: #ffffff;
+  --miss: #b9450f;
+  --miss-soft: #fbe9df;
+  --known: #1d7a3e;
+  --known-soft: #e1f2e6;
+  --code-bg: #10202b;
+  --code-ink: #d9e6ee;
+  --tok-kw: #7cc7f2;
+  --tok-str: #f2c86b;
+  --tok-com: #7d93a3;
+  --tok-num: #f2a2c8;
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b141b; --surface: #111e27; --ink: #e2eaf0; --muted: #8fa2b0; --line: #22333f;
+    --accent: #3cc7b6; --accent-soft: #123532; --accent-ink: #052421;
+    --miss: #f08a52; --miss-soft: #3a2116; --known: #5cc98a; --known-soft: #142d1f;
+    --code-bg: #071017; --code-ink: #d9e6ee;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b141b; --surface: #111e27; --ink: #e2eaf0; --muted: #8fa2b0; --line: #22333f;
+  --accent: #3cc7b6; --accent-soft: #123532; --accent-ink: #052421;
+  --miss: #f08a52; --miss-soft: #3a2116; --known: #5cc98a; --known-soft: #142d1f;
+  --code-bg: #071017; --code-ink: #d9e6ee;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+
+#app[data-lang="fr"] [lang="en"], #app[data-lang="en"] [lang="fr"] { display: none !important; }
+
+.wrap { max-width: 780px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Header */
+.top { background: var(--surface); border-bottom: 1px solid var(--line); }
+.top .wrap { padding-block: 28px 20px; display: grid; gap: 6px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 6vw, 40px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); margin: 4px 0 0; max-width: 62ch; }
+
+/* Sticky control bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+.bar .wrap { padding-block: 10px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.group { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.group button { border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--ink); font: 500 13px var(--font-body); padding: 7px 12px; cursor: pointer; }
+.group button:last-child { border-right: 0; }
+.group button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.btn { border: 1px solid var(--line); background: transparent; color: var(--ink); font: 500 13px var(--font-body); padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+.btn:hover, .group button:hover { border-color: var(--accent); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stats { margin-left: auto; font: 500 13px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; display: flex; gap: 12px; }
+.stats .k { color: var(--known); } .stats .m { color: var(--miss); }
+
+/* How-to */
+.howto { padding-block: 18px 6px; color: var(--muted); font-size: 14px; }
+.howto strong { color: var(--ink); }
+
+/* Deck */
+.deck { display: grid; gap: 14px; padding-block: 14px 40px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; display: grid; gap: 12px; min-width: 0; }
+.card.is-known { border-color: var(--known); }
+.card.is-missed { border-color: var(--miss); }
+.head { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: start; }
+.num { font: 600 13px var(--font-mono); color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 3px 7px; font-variant-numeric: tabular-nums; }
+.q { font-family: var(--font-display); font-weight: 600; font-size: 18px; line-height: 1.35; margin: 0; text-wrap: balance; min-width: 0; }
+.tags { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font: 500 11.5px var(--font-mono); letter-spacing: 0.03em; padding: 2px 8px; border-radius: 999px; background: var(--miss-soft); color: var(--miss); }
+.tag.top { background: var(--accent-soft); color: var(--accent); }
+.tag.state { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+
+.reveal { justify-self: start; border: 1px solid var(--accent); background: transparent; color: var(--accent); font: 600 13px var(--font-body); padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+.reveal:hover { background: var(--accent-soft); }
+#app[data-mode="read"] .reveal { display: none; }
+
+.answer { display: grid; gap: 12px; min-width: 0; border-top: 1px dashed var(--line); padding-top: 12px; }
+.answer p { margin: 0; }
+.key { font-size: 16px; }
+.key strong { color: var(--accent); }
+.answer ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+code { font-family: var(--font-mono); font-size: 0.92em; background: var(--accent-soft); color: var(--ink); padding: 1px 5px; border-radius: 4px; }
+pre { margin: 0; background: var(--code-bg); color: var(--code-ink); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font: 13px/1.55 var(--font-mono); min-width: 0; }
+pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+.tk-kw { color: var(--tok-kw); } .tk-str { color: var(--tok-str); } .tk-com { color: var(--tok-com); font-style: italic; } .tk-num { color: var(--tok-num); }
+
+.tbl { overflow-x: auto; min-width: 0; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 12px var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+
+.memo { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; }
+.memo .lbl { font: 600 11px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+
+.grade { display: flex; flex-wrap: wrap; gap: 8px; }
+.grade button { border: 1px solid var(--line); background: transparent; color: var(--ink); font: 500 13px var(--font-body); padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+.grade button[data-grade="known"][aria-pressed="true"] { background: var(--known-soft); border-color: var(--known); color: var(--known); }
+.grade button[data-grade="missed"][aria-pressed="true"] { background: var(--miss-soft); border-color: var(--miss); color: var(--miss); }
+
+.empty { text-align: center; color: var(--muted); padding: 30px 0; }
+footer { color: var(--muted); font-size: 13px; padding-block: 0 40px; }
+
+@media (max-width: 520px) {
+  .stats { margin-left: 0; width: 100%; }
+  .q { font-size: 16.5px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .answer:not([hidden]) { animation: open 160ms ease-out; }
+  @keyframes open { from { opacity: 0.4; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+}
+</style>
+
+<div id="app" data-lang="fr" data-mode="quiz" data-filter="all">
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Terraform Associate 004 · <span lang="fr">examen semaine du 15/12/2026</span><span lang="en">exam week of 15 Dec 2026</span></div>
+    <h1>Terraform Trap Cards</h1>
+    <p class="lede" lang="fr">Les 18 pièges sur lesquels je suis déjà tombé, et seulement eux. Chaque carte vient d'une vraie erreur notée dans PROGRESS.md.</p>
+    <p class="lede" lang="en">The 18 traps I have already fallen into, and nothing else. Every card comes from a real miss logged in PROGRESS.md.</p>
+  </div>
+</header>
+
+<nav class="bar" aria-label="Controls">
+  <div class="wrap">
+    <div class="group" role="group" aria-label="Language">
+      <button type="button" id="lang-fr" data-lang-set="fr" aria-pressed="true">FR</button>
+      <button type="button" id="lang-en" data-lang-set="en" aria-pressed="false">EN</button>
+    </div>
+    <div class="group" role="group" aria-label="Mode">
+      <button type="button" id="mode-quiz" data-mode-set="quiz" aria-pressed="true"><span lang="fr">Quiz</span><span lang="en">Quiz</span></button>
+      <button type="button" id="mode-read" data-mode-set="read" aria-pressed="false"><span lang="fr">Lecture</span><span lang="en">Read</span></button>
+    </div>
+    <div class="group" role="group" aria-label="Filter">
+      <button type="button" id="filter-all" data-filter-set="all" aria-pressed="true"><span lang="fr">Toutes</span><span lang="en">All</span></button>
+      <button type="button" id="filter-top" data-filter-set="top" aria-pressed="false">Top 6</button>
+      <button type="button" id="filter-review" data-filter-set="review" aria-pressed="false"><span lang="fr">À revoir</span><span lang="en">To review</span></button>
+    </div>
+    <button type="button" class="btn" id="shuffle"><span lang="fr">Mélanger</span><span lang="en">Shuffle</span></button>
+    <button type="button" class="btn" id="reset"><span lang="fr">Remettre à zéro</span><span lang="en">Reset</span></button>
+    <div class="stats" aria-live="polite">
+      <span class="k"><span id="n-known">0</span> <span lang="fr">sues</span><span lang="en">known</span></span>
+      <span class="m"><span id="n-missed">0</span> <span lang="fr">à revoir</span><span lang="en">to review</span></span>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="howto">
+    <p lang="fr"><strong>Comment s'en servir :</strong> lis la question, réponds <strong>à voix haute</strong>, puis ouvre la réponse. Marque-toi honnêtement : <em>Je savais</em> ou <em>Raté</em>. Le filtre « À revoir » ne garde que les ratées. Le mode <em>Lecture</em> ouvre toutes les réponses d'un coup, pour réviser.</p>
+    <p lang="en"><strong>How to use:</strong> read the question, answer <strong>out loud</strong>, then open the answer. Mark yourself honestly: <em>I knew it</em> or <em>Missed it</em>. The "To review" filter keeps only the missed ones. <em>Read</em> mode opens every answer at once, for revision.</p>
+  </div>
+
+  <section class="deck" id="deck">
+
+    <!-- 1 -->
+    <article class="card" data-id="1" data-top="1">
+      <div class="head">
+        <span class="num">01</span>
+        <h2 class="q"><span lang="fr">Dans <code>dynamic "ingress"</code>, comment je référence l'élément courant ?</span><span lang="en">In <code>dynamic "ingress"</code>, how do I reference the current element?</span></h2>
+        <div class="tags"><span class="tag top">Top 6</span><span class="tag"><span lang="fr">raté 5×</span><span lang="en">missed 5×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a1"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a1" hidden>
+        <p class="key" lang="fr"><strong>ingress.key / ingress.value</strong> : l'itérateur prend <strong>le nom du bloc</strong>.</p>
+        <p class="key" lang="en"><strong>ingress.key / ingress.value</strong>: the iterator takes <strong>the block's name</strong>.</p>
+        <pre><code data-hl>variable "ports" {
+  default = [22, 443]
+}
+
+resource "aws_security_group" "web" {
+  name = "web"
+
+  dynamic "ingress" {               # the name in quotes...
+    for_each = var.ports
+    content {
+      from_port   = ingress.value   # ...becomes the iterator
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["10.0.0.0/16"]
+    }
+  }
+}</code></pre>
+        <div class="tbl"><table>
+          <thead><tr><th lang="fr">Contexte</th><th lang="en">Context</th><th lang="fr">On écrit</th><th lang="en">You write</th></tr></thead>
+          <tbody>
+            <tr><td><code>count</code></td><td><code>count.index</code></td></tr>
+            <tr><td><code>for_each</code> <span lang="fr">(ressource, module)</span><span lang="en">(resource, module)</span></td><td><code>each.key</code> / <code>each.value</code></td></tr>
+            <tr><td><code>dynamic "X"</code></td><td><code>X.key</code> / <code>X.value</code> <span lang="fr">(ou <code>iterator = r</code> → <code>r.value</code>)</span><span lang="en">(or <code>iterator = r</code> → <code>r.value</code>)</span></td></tr>
+            <tr><td><code>precondition</code> / <code>postcondition</code></td><td><code>self.&lt;attr&gt;</code></td></tr>
+          </tbody>
+        </table></div>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Le mot entre guillemets devient le prénom de l'élément. Jamais <code>each</code>, jamais <code>self</code>.</span><span lang="en">The word in quotes becomes the element's first name. Never <code>each</code>, never <code>self</code>.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 2 -->
+    <article class="card" data-id="2" data-top="1">
+      <div class="head">
+        <span class="num">02</span>
+        <h2 class="q"><span lang="fr">Que fige exactement <code>.terraform.lock.hcl</code>, et que ne fige-t-il pas ?</span><span lang="en">What exactly does <code>.terraform.lock.hcl</code> pin, and what does it not?</span></h2>
+        <div class="tags"><span class="tag top">Top 6</span><span class="tag"><span lang="fr">raté 3×</span><span lang="en">missed 3×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a2"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a2" hidden>
+        <p class="key" lang="fr"><strong>Les versions des providers + leurs empreintes (hashes).</strong> C'est tout. On le committe.</p>
+        <p class="key" lang="en"><strong>Provider versions + their checksums (hashes).</strong> That's all. Commit it.</p>
+        <pre><code data-hl># .terraform.lock.hcl  (written by terraform init)
+provider "registry.terraform.io/hashicorp/local" {
+  version     = "2.9.1"
+  constraints = "~> 2.5"
+  hashes = [
+    "h1:...",
+  ]
+}</code></pre>
+        <pre><code data-hl>terraform {
+  required_version = ">= 1.12"     # Terraform core: NOT in the lock file
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 5.0"               # modules: NOT in the lock file
+}</code></pre>
+        <ul lang="fr"><li>Créé et mis à jour par <code>terraform init</code>.</li><li><code>terraform init -upgrade</code> passe aux versions les plus récentes que tes contraintes autorisent.</li></ul>
+        <ul lang="en"><li>Created and updated by <code>terraform init</code>.</li><li><code>terraform init -upgrade</code> moves to the newest versions your constraints allow.</li></ul>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Lock = providers, point final.</span><span lang="en">Lock = providers, full stop.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 3 -->
+    <article class="card" data-id="3" data-top="1">
+      <div class="head">
+        <span class="num">03</span>
+        <h2 class="q"><span lang="fr">Quelles sources de module acceptent <code>version</code> ? Comment figer un module Git ?</span><span lang="en">Which module sources accept <code>version</code>? How do I pin a Git module?</span></h2>
+        <div class="tags"><span class="tag top">Top 6</span><span class="tag"><span lang="fr">raté 3×</span><span lang="en">missed 3×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a3"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a3" hidden>
+        <p class="key" lang="fr"><strong>Seulement les registres, public et privé.</strong> Ailleurs, <code>version</code> provoque une erreur. Un module Git se fige avec <strong><code>?ref=</code> dans l'URL</strong>.</p>
+        <p class="key" lang="en"><strong>Registries only, public and private.</strong> Anywhere else, <code>version</code> is an error. A Git module is pinned with <strong><code>?ref=</code> in the URL</strong>.</p>
+        <pre><code data-hl>module "local_one" {
+  source = "./modules/network"                  # local: no version, it's my code
+}
+
+module "public_one" {
+  source  = "terraform-aws-modules/vpc/aws"     # NAMESPACE/NAME/PROVIDER
+  version = "~> 5.0"
+}
+
+module "private_one" {
+  source  = "app.terraform.io/acme/net/azurerm" # HOST/ORG/NAME/PROVIDER
+  version = "~> 1.0"
+}
+
+module "git_one" {
+  source = "git::https://github.com/acme/infra.git//modules/net?ref=v1.2.0"
+}</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr"><code>version</code> → registre uniquement. Le registre privé se reconnaît à <strong>l'hôte devant</strong> (4 segments au lieu de 3). Changer <code>source</code> ou <code>ref</code> → relancer <code>terraform init</code>.</span><span lang="en"><code>version</code> → registry only. A private registry shows <strong>the host first</strong> (4 segments instead of 3). Changing <code>source</code> or <code>ref</code> → run <code>terraform init</code> again.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 4 -->
+    <article class="card" data-id="4">
+      <div class="head">
+        <span class="num">04</span>
+        <h2 class="q"><span lang="fr">Qu'autorise <code>~> 2.5</code> ?</span><span lang="en">What does <code>~> 2.5</code> allow?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 1×</span><span lang="en">missed 1×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a4"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a4" hidden>
+        <p class="key" lang="fr"><strong>Seul le dernier chiffre écrit peut bouger.</strong></p>
+        <p class="key" lang="en"><strong>Only the rightmost number you wrote may move.</strong></p>
+        <pre><code data-hl>version = "~> 2.5"     # >= 2.5,   &lt; 3.0    minor may move
+version = "~> 2.5.0"   # >= 2.5.0, &lt; 2.6.0  patch only
+version = ">= 2.5"     # no upper limit at all (3.0, 4.0...)
+version = "= 2.5.0"    # exactly this one</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Le tilde bloque tout sauf le dernier chiffre écrit.</span><span lang="en">The tilde locks everything except the last digit you wrote.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 5 -->
+    <article class="card" data-id="5">
+      <div class="head">
+        <span class="num">05</span>
+        <h2 class="q"><span lang="fr">Priorité des variables, de la plus faible à la plus forte ?</span><span lang="en">Variable precedence, lowest to highest?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 3×</span><span lang="en">missed 3×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a5"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a5" hidden>
+        <ol lang="fr"><li><code>default</code> dans le bloc <code>variable</code> (le plus faible)</li><li>variables d'environnement <code>TF_VAR_nom</code></li><li><code>terraform.tfvars</code></li><li><code>terraform.tfvars.json</code></li><li><code>*.auto.tfvars</code>, dans l'ordre alphabétique</li><li><code>-var</code> / <code>-var-file</code> dans la commande : <strong>gagne</strong> (s'il y en a plusieurs, le dernier)</li></ol>
+        <ol lang="en"><li><code>default</code> in the <code>variable</code> block (lowest)</li><li><code>TF_VAR_name</code> environment variables</li><li><code>terraform.tfvars</code></li><li><code>terraform.tfvars.json</code></li><li><code>*.auto.tfvars</code>, in alphabetical order</li><li><code>-var</code> / <code>-var-file</code> on the command line: <strong>wins</strong> (if several, the last one)</li></ol>
+        <pre><code data-hl>export TF_VAR_region=eu                     # 2 · environment: low
+echo 'region = "us"'   > terraform.tfvars   # 3
+echo 'region = "asia"' > prod.auto.tfvars   # 5
+terraform plan -var 'region=mars'           # 6 · wins → mars</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Du plus loin au plus proche de ce que tu tapes maintenant. Piège : <code>TF_VAR_x=… terraform plan</code> sur une ligne reste une variable d'environnement (niveau 2).</span><span lang="en">From the furthest to the closest to what you type right now. Trap: <code>TF_VAR_x=… terraform plan</code> on one line is still an environment variable (level 2).</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 6 -->
+    <article class="card" data-id="6" data-top="1">
+      <div class="head">
+        <span class="num">06</span>
+        <h2 class="q"><span lang="fr">Run <strong>tasks</strong> ou run <strong>triggers</strong> : quelle différence ?</span><span lang="en">Run <strong>tasks</strong> vs run <strong>triggers</strong>: what's the difference?</span></h2>
+        <div class="tags"><span class="tag top">Top 6</span><span class="tag"><span lang="fr">raté 2×</span><span lang="en">missed 2×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a6"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a6" hidden>
+        <ul lang="fr"><li><strong>Run task</strong> : brancher un <strong>outil externe</strong> dans un run (scan de sécurité, estimation de coût).</li><li><strong>Run trigger</strong> : quand ce workspace applique avec succès, un run est mis en file dans <strong>un autre workspace</strong>.</li><li>Les <strong>politiques</strong> (Sentinel / OPA) sont vérifiées <strong>après le plan, avant l'apply</strong>. Niveaux : <em>advisory</em> (avertit), <em>soft-mandatory</em> (contournable par un utilisateur autorisé), <em>hard-mandatory</em> (doit passer).</li></ul>
+        <ul lang="en"><li><strong>Run task</strong>: plug an <strong>external tool</strong> into a run (security scan, cost estimate).</li><li><strong>Run trigger</strong>: when this workspace applies successfully, a run is queued in <strong>another workspace</strong>.</li><li><strong>Policies</strong> (Sentinel / OPA) run <strong>after the plan, before the apply</strong>. Levels: <em>advisory</em> (warns), <em>soft-mandatory</em> (authorised users can override), <em>hard-mandatory</em> (must pass).</li></ul>
+        <pre><code data-hl># run trigger: between workspaces
+network-prod ── apply OK ──▶ run trigger ──▶ app-prod: new run queued
+
+# inside one run
+plan ──▶ run task (security scanner) ──▶ policies (Sentinel/OPA) ──▶ apply</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr"><strong>Task</strong> = une tâche confiée à un autre outil. <strong>Trigger</strong> = une gâchette qui déclenche un autre workspace.</span><span lang="en"><strong>Task</strong> = a job handed to another tool. <strong>Trigger</strong> = a trigger that fires another workspace.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 7 -->
+    <article class="card" data-id="7">
+      <div class="head">
+        <span class="num">07</span>
+        <h2 class="q"><span lang="fr">Donner des droits sur tout un groupe de workspaces d'un coup ?</span><span lang="en">Grant rights on a whole group of workspaces at once?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 2×</span><span lang="en">missed 2×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a7"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a7" hidden>
+        <p class="key" lang="fr"><strong>Un project.</strong> Organisation → projects → workspaces ; c'est le project qui porte les permissions.</p>
+        <p class="key" lang="en"><strong>A project.</strong> Organisation → projects → workspaces; the project carries the permissions.</p>
+        <pre><code data-hl>organization: lquastana-lab
+└── project: terraform-lab        # team "Network" gets write access HERE
+    ├── workspace: network-prod
+    └── workspace: app-prod</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr"><strong>Teams</strong> = des gens. <strong>Projects</strong> = des workspaces. Un <em>policy set</em> = un groupe de politiques.</span><span lang="en"><strong>Teams</strong> = people. <strong>Projects</strong> = workspaces. A <em>policy set</em> = a group of policies.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 8 -->
+    <article class="card" data-id="8" data-top="1">
+      <div class="head">
+        <span class="num">08</span>
+        <h2 class="q"><span lang="fr"><code>count</code> sur <code>["a", "b", "c"]</code> : je retire <code>"a"</code>. Et avec <code>for_each</code> ?</span><span lang="en"><code>count</code> over <code>["a", "b", "c"]</code>: I remove <code>"a"</code>. And with <code>for_each</code>?</span></h2>
+        <div class="tags"><span class="tag top">Top 6</span><span class="tag"><span lang="fr">raté 5×</span><span lang="en">missed 5×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a8"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a8" hidden>
+        <div class="tbl"><table>
+          <thead><tr><th lang="fr">Je retire…</th><th lang="en">I remove…</th><th><code>count</code></th><th><code>for_each</code></th></tr></thead>
+          <tbody>
+            <tr><td><code>"a"</code></td><td lang="fr">[0] et [1] remplacés, [2] détruit</td><td lang="en">[0] and [1] replaced, [2] destroyed</td><td lang="fr">seul <code>["a"]</code> détruit</td><td lang="en">only <code>["a"]</code> destroyed</td></tr>
+            <tr><td><code>"b"</code></td><td lang="fr">[0] intact, [1] remplacé, [2] détruit</td><td lang="en">[0] untouched, [1] replaced, [2] destroyed</td><td lang="fr">seul <code>["b"]</code> détruit</td><td lang="en">only <code>["b"]</code> destroyed</td></tr>
+            <tr><td><code>"c"</code></td><td lang="fr">seul [2] détruit</td><td lang="en">only [2] destroyed</td><td lang="fr">seul <code>["c"]</code> détruit</td><td lang="en">only <code>["c"]</code> destroyed</td></tr>
+          </tbody>
+        </table></div>
+        <pre><code data-hl>resource "local_file" "by_count" {
+  count    = length(var.names)        # [0] [1] [2]  → positions
+  filename = "${var.names[count.index]}.txt"
+  content  = var.names[count.index]
+}
+
+resource "local_file" "by_key" {
+  for_each = toset(var.names)         # ["a"] ["b"] ["c"]  → names
+  filename = "${each.key}.txt"
+  content  = each.value
+}</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr"><code>count</code> = des sièges numérotés : seuls ceux <strong>derrière</strong> avancent. <code>for_each</code> = des badges nominatifs. <code>count</code> + <code>for_each</code> ensemble = « Invalid combination ».</span><span lang="en"><code>count</code> = numbered seats: only the people <strong>behind</strong> move up. <code>for_each</code> = name badges. <code>count</code> + <code>for_each</code> together = "Invalid combination".</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 9 -->
+    <article class="card" data-id="9" data-top="1">
+      <div class="head">
+        <span class="num">09</span>
+        <h2 class="q"><span lang="fr">Workspace HCP relié à GitHub, et je lance <code>terraform apply</code> depuis mon terminal ?</span><span lang="en">HCP workspace connected to GitHub, and I run <code>terraform apply</code> from my terminal?</span></h2>
+        <div class="tags"><span class="tag top">Top 6</span><span class="tag"><span lang="fr">raté 3×</span><span lang="en">missed 3×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a9"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a9" hidden>
+        <p class="key" lang="fr"><strong>Erreur : l'apply est refusé.</strong> Un workspace piloté par Git n'accepte que les runs venus de Git.</p>
+        <p class="key" lang="en"><strong>Error: the apply is refused.</strong> A VCS-driven workspace only takes runs that come from Git.</p>
+        <pre><code data-hl>$ terraform apply
+Error: Apply not allowed for workspaces with a VCS connection
+
+A workspace that is connected to a VCS requires the VCS-driven
+workflow to ensure that the VCS remains the single source of truth.</code></pre>
+        <ul lang="fr"><li><strong>VCS-driven</strong> : un push sur la branche suivie lance un run ; une pull request donne un <strong>plan spéculatif</strong> (non applicable).</li><li><strong>CLI-driven</strong> : bloc <code>cloud</code>, runs lancés depuis le terminal.</li><li>Modes d'exécution : <strong>Remote</strong>, <strong>Local</strong> (plan/apply sur ma machine, state dans HCP), <strong>Agent</strong>. « Speculative » n'est pas un mode.</li></ul>
+        <ul lang="en"><li><strong>VCS-driven</strong>: a push to the tracked branch starts a run; a pull request gets a <strong>speculative plan</strong> (can't be applied).</li><li><strong>CLI-driven</strong>: <code>cloud</code> block, runs started from the terminal.</li><li>Execution modes: <strong>Remote</strong>, <strong>Local</strong> (plan/apply on my machine, state in HCP), <strong>Agent</strong>. "Speculative" is not a mode.</li></ul>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Git est le seul chef : pas d'apply en douce depuis ton PC.</span><span lang="en">Git is the only boss: no sneaky apply from your laptop.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 10 -->
+    <article class="card" data-id="10">
+      <div class="head">
+        <span class="num">10</span>
+        <h2 class="q"><span lang="fr">Que contient vraiment le fichier de state ?</span><span lang="en">What does the state file really contain?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 4×</span><span lang="en">missed 4×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a10"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a10" hidden>
+        <p class="key" lang="fr"><strong>Ce que Terraform a créé ou lu</strong> : les ressources (tous leurs attributs, dont les ID), les outputs, et des métadonnées. <strong>Jamais ton code</strong> : ni les blocs <code>variable</code>, ni les fichiers <code>.tf</code>, ni les binaires des providers (ils sont dans <code>.terraform/</code>).</p>
+        <p class="key" lang="en"><strong>What Terraform created or read</strong>: resources (all their attributes, IDs included), outputs and metadata. <strong>Never your code</strong>: no <code>variable</code> blocks, no <code>.tf</code> files, no provider binaries (those live in <code>.terraform/</code>).</p>
+        <pre><code data-hl>{
+  "version": 4,
+  "terraform_version": "1.16.6",
+  "serial": 8,                    // +1 on every state write
+  "lineage": "89e7f2cc-...",      // identity: never changes
+  "outputs": {
+    "api_key": { "value": "default_api_key", "sensitive": true }   // plain text!
+  },
+  "resources": [{
+    "mode": "managed", "type": "local_file", "name": "conf",
+    "instances": [{
+      "attributes": { "id": "8d9c2a9d..." },        // mapping: address → real id
+      "dependencies": ["random_pet.app"]           // metadata
+    }]
+  }],
+  "check_results": null
+}</code></pre>
+        <div class="tbl"><table>
+          <thead><tr><th lang="fr">Rôle</th><th lang="en">Role</th><th lang="fr">Ce que tu as vu (13-state)</th><th lang="en">What you saw (13-state)</th></tr></thead>
+          <tbody>
+            <tr><td>Mapping</td><td lang="fr"><code>random_pet.app → id leading-longhorn</code> ; bloc supprimé du code → « will be destroyed »</td><td lang="en"><code>random_pet.app → id leading-longhorn</code>; block deleted from code → "will be destroyed"</td></tr>
+            <tr><td lang="fr">Métadonnées</td><td lang="en">Metadata</td><td lang="fr"><code>dependencies</code> : remplacer l'animal a recréé le fichier</td><td lang="en"><code>dependencies</code>: replacing the pet rebuilt the file</td></tr>
+            <tr><td lang="fr">Performance (cache)</td><td lang="en">Performance (cache)</td><td lang="fr"><code>plan -refresh=false</code> ne voit pas la dérive</td><td lang="en"><code>plan -refresh=false</code> misses drift</td></tr>
+            <tr><td lang="fr">Synchronisation</td><td lang="en">Syncing</td><td lang="fr"><code>serial</code> 3 → 8, <code>lineage</code> fixe, verrou</td><td lang="en"><code>serial</code> 3 → 8, fixed <code>lineage</code>, locking</td></tr>
+          </tbody>
+        </table></div>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Créé ou lu par Terraform → dans le state. Écrit par toi → dans le code.</span><span lang="en">Created or read by Terraform → in the state. Written by you → in the code.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 11 -->
+    <article class="card" data-id="11">
+      <div class="head">
+        <span class="num">11</span>
+        <h2 class="q"><span lang="fr"><code>init -migrate-state</code> ou <code>init -reconfigure</code> ?</span><span lang="en"><code>init -migrate-state</code> vs <code>init -reconfigure</code>?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 2×</span><span lang="en">missed 2×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a11"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a11" hidden>
+        <p class="key" lang="fr">Les deux s'utilisent avec <code>terraform init</code> après <strong>un changement du bloc <code>backend</code></strong>.</p>
+        <p class="key" lang="en">Both go with <code>terraform init</code> after <strong>changing the <code>backend</code> block</strong>.</p>
+        <pre><code data-hl>terraform init -migrate-state   # COPIES the state → plan says "No changes"
+terraform init -reconfigure     # copies NOTHING → empty backend: plan recreates everything
+
+# the backend block can't use variables → partial configuration:
+terraform init -backend-config="path=state/prod.tfstate"</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr"><strong>Migrate</strong> = déménager avec ses meubles. <strong>Reconfigure</strong> = emménager dans un appartement vide.</span><span lang="en"><strong>Migrate</strong> = moving house with your furniture. <strong>Reconfigure</strong> = moving into an empty flat.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 12 -->
+    <article class="card" data-id="12">
+      <div class="head">
+        <span class="num">12</span>
+        <h2 class="q"><span lang="fr"><code>sensitive</code>, <code>ephemeral</code> ou write-only ?</span><span lang="en"><code>sensitive</code> vs <code>ephemeral</code> vs write-only?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 3×</span><span lang="en">missed 3×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a12"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a12" hidden>
+        <div class="tbl"><table>
+          <thead><tr><th></th><th lang="fr">Affichage</th><th lang="en">CLI output</th><th lang="fr">Plan / state</th><th lang="en">Plan / state</th></tr></thead>
+          <tbody>
+            <tr><td><code>sensitive = true</code></td><td lang="fr">masqué</td><td lang="en">hidden</td><td lang="fr"><strong>en clair</strong> (et <code>output -raw</code> l'affiche)</td><td lang="en"><strong>plain text</strong> (and <code>output -raw</code> prints it)</td></tr>
+            <tr><td><code>ephemeral</code></td><td>—</td><td lang="fr"><strong>jamais stocké</strong></td><td lang="en"><strong>never stored</strong></td></tr>
+            <tr><td><span lang="fr">argument write-only</span><span lang="en">write-only argument</span></td><td>—</td><td lang="fr"><strong>jamais stocké</strong> : envoyé à l'API puis oublié</td><td lang="en"><strong>never stored</strong>: sent to the API, then forgotten</td></tr>
+          </tbody>
+        </table></div>
+        <pre><code data-hl>variable "db_password" {
+  type      = string
+  sensitive = true                     # hidden in output, PLAIN TEXT in state
+}
+
+ephemeral "random_password" "tmp" {    # never written to plan or state
+  length = 20
+}
+
+resource "aws_db_instance" "main" {
+  # ...
+  password_wo         = ephemeral.random_password.tmp.result   # write-only
+  password_wo_version = 1              # bump it to push a new value
+}
+
+output "pw" {
+  value     = var.db_password
+  sensitive = true                     # mandatory, or "Output refers to sensitive values"
+}</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Sensitive <strong>cache</strong>. Éphémère <strong>ne stocke pas</strong>. Une valeur éphémère n'est acceptée qu'à 2 endroits : un <strong>bloc provider</strong> et un <strong>argument write-only</strong>.</span><span lang="en">Sensitive <strong>hides</strong>. Ephemeral <strong>doesn't store</strong>. An ephemeral value is accepted in exactly 2 places: a <strong>provider block</strong> and a <strong>write-only argument</strong>.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 13 -->
+    <article class="card" data-id="13">
+      <div class="head">
+        <span class="num">13</span>
+        <h2 class="q"><span lang="fr">Quelles conditions personnalisées arrêtent le run ?</span><span lang="en">Which custom conditions stop the run?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 1×</span><span lang="en">missed 1×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a13"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a13" hidden>
+        <p class="key" lang="fr"><strong><code>validation</code>, <code>precondition</code>, <code>postcondition</code> → erreur, le run s'arrête.</strong> Le bloc <code>check</code> → <strong>avertissement</strong> seulement, le run continue.</p>
+        <p class="key" lang="en"><strong><code>validation</code>, <code>precondition</code>, <code>postcondition</code> → error, the run stops.</strong> A <code>check</code> block → <strong>warning</strong> only, the run continues.</p>
+        <pre><code data-hl>variable "env" {
+  type = string
+  validation {                                  # error → run stops
+    condition     = contains(["dev", "prod"], var.env)
+    error_message = "env must be dev or prod."
+  }
+}
+
+resource "local_file" "conf" {
+  filename = "app.conf"
+  content  = "env=${var.env}"
+  lifecycle {
+    postcondition {                             # error → run stops
+      condition     = self.content != ""
+      error_message = "Empty config."
+    }
+  }
+}
+
+check "conf_present" {                          # WARNING only → run continues
+  assert {
+    condition     = fileexists("app.conf")
+    error_message = "app.conf is missing."
+  }
+}</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Seul <code>check</code> chuchote. Et Terraform ne revient jamais en arrière : ce qu'un apply interrompu a créé reste dans le state.</span><span lang="en">Only <code>check</code> whispers. And Terraform never rolls back: whatever an interrupted apply created stays in the state.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 14 -->
+    <article class="card" data-id="14">
+      <div class="head">
+        <span class="num">14</span>
+        <h2 class="q"><span lang="fr"><code>TF_LOG</code> et <code>TF_LOG_PATH</code> : qui fait quoi ?</span><span lang="en"><code>TF_LOG</code> and <code>TF_LOG_PATH</code>: who does what?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 2×</span><span lang="en">missed 2×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a14"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a14" hidden>
+        <p class="key" lang="fr">Du plus bavard au moins bavard : <strong>TRACE → DEBUG → INFO → WARN → ERROR</strong>.</p>
+        <p class="key" lang="en">Most to least verbose: <strong>TRACE → DEBUG → INFO → WARN → ERROR</strong>.</p>
+        <pre><code data-hl>TF_LOG=DEBUG terraform plan                      # logs on stderr (the terminal)
+TF_LOG=TRACE TF_LOG_PATH=tf.log terraform plan   # logs written to tf.log
+TF_LOG_PATH=tf.log terraform plan                # NOTHING is written
+TF_LOG=JSON terraform plan                       # a format (TRACE in JSON), not a level</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr"><code>TF_LOG</code> = l'interrupteur et le volume. <code>TF_LOG_PATH</code> = seulement l'adresse de livraison. « To Debug, Inspect Warnings and Errors ». Un crash écrit <code>crash.log</code>.</span><span lang="en"><code>TF_LOG</code> = the switch and the volume. <code>TF_LOG_PATH</code> = only the delivery address. "To Debug, Inspect Warnings and Errors." A crash writes <code>crash.log</code>.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 15 -->
+    <article class="card" data-id="15">
+      <div class="head">
+        <span class="num">15</span>
+        <h2 class="q"><span lang="fr">Accepter un changement manuel dans le state, sans toucher à l'infra ?</span><span lang="en">Accept a manual change into the state, without touching the infrastructure?</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 1×</span><span lang="en">missed 1×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a15"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a15" hidden>
+        <pre><code data-hl>terraform plan  -refresh-only    # "Objects have changed outside of Terraform"
+terraform apply -refresh-only    # writes reality into the state, after yes
+# then update the code → terraform plan says "No changes"
+
+terraform refresh                # same idea, DEPRECATED (writes without showing)
+terraform plan -refresh=false    # the opposite: skips the refresh, misses drift</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr"><code>-refresh-only</code> = accepter la réalité. Un <code>apply</code> normal = imposer le code.</span><span lang="en"><code>-refresh-only</code> = accept reality. A plain <code>apply</code> = enforce the code.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 16 -->
+    <article class="card" data-id="16">
+      <div class="head">
+        <span class="num">16</span>
+        <h2 class="q"><span lang="fr">« Quelle commande fait X ? » : les six qui m'ont eu</span><span lang="en">"Which command does X?": the six that got me</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 5/5 (examen blanc 1)</span><span lang="en">missed 5/5 (mock 1)</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a16"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a16" hidden>
+        <div class="tbl"><table>
+          <thead><tr><th lang="fr">Je veux…</th><th lang="en">I want to…</th><th lang="fr">Commande</th><th lang="en">Command</th></tr></thead>
+          <tbody>
+            <tr><td lang="fr">prévisualiser <strong>et sauvegarder</strong> le plan</td><td lang="en">preview <strong>and save</strong> the plan</td><td><code>terraform plan -out=tfplan</code> → <code>apply tfplan</code></td></tr>
+            <tr><td lang="fr">vérifier le format <strong>en CI</strong></td><td lang="en">check formatting <strong>in CI</strong></td><td><code>terraform fmt -check -recursive</code></td></tr>
+            <tr><td lang="fr"><strong>lire</strong> un objet que je ne gère pas</td><td lang="en"><strong>read</strong> an object I don't manage</td><td><code>data "type" "name"</code> → <code>data.type.name.attr</code></td></tr>
+            <tr><td lang="fr"><strong>générer le code</strong> des blocs import</td><td lang="en"><strong>generate the code</strong> for import blocks</td><td><code>terraform plan -generate-config-out=gen.tf</code></td></tr>
+            <tr><td lang="fr"><strong>lister</strong> le state</td><td lang="en"><strong>list</strong> the state</td><td><code>terraform state list</code></td></tr>
+            <tr><td lang="fr">libérer un <strong>verrou bloqué</strong></td><td lang="en">release a <strong>stuck lock</strong></td><td><code>terraform force-unlock LOCK_ID</code></td></tr>
+          </tbody>
+        </table></div>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Sur ces questions, les mauvaises réponses sont de vraies commandes qui font autre chose. Lis chaque option jusqu'au bout.</span><span lang="en">On these questions, the wrong answers are real commands that do something else. Read every option to the end.</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 17 -->
+    <article class="card" data-id="17">
+      <div class="head">
+        <span class="num">17</span>
+        <h2 class="q"><span lang="fr">L'import : les deux façons</span><span lang="en">Import: the two ways</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">raté 2×</span><span lang="en">missed 2×</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a17"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a17" hidden>
+        <pre><code data-hl>import {
+  to = random_string.api_key      # the address in MY code
+  id = "Hl7Fhir2026Key"           # the real object's id
+}
+# terraform plan -generate-config-out=generated.tf   → writes the resource block
+
+# The old way: the resource block must exist FIRST,
+# it writes the state immediately, no plan, one at a time
+terraform import random_string.legacy OldToken2024</code></pre>
+        <div class="memo"><span class="lbl" lang="fr">Image à retenir</span><span class="lbl" lang="en">Memory hook</span><span lang="fr">Importer <strong>vers</strong> (<code>to</code>) mon code, l'objet <strong>n° id</strong>. Après tout import, <code>plan</code> doit dire « No changes ».</span><span lang="en">Import <strong>to</strong> my code, object <strong>number id</strong>. After any import, <code>plan</code> must say "No changes".</span></div>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+    <!-- 18 -->
+    <article class="card" data-id="18">
+      <div class="head">
+        <span class="num">18</span>
+        <h2 class="q"><span lang="fr">Les petits pièges de l'examen blanc 3</span><span lang="en">Mock exam 3's one-liners</span></h2>
+        <div class="tags"><span class="tag"><span lang="fr">nouveaux, 15/11</span><span lang="en">new, 15 Nov</span></span></div>
+      </div>
+      <button type="button" class="reveal" aria-expanded="false" aria-controls="a18"><span lang="fr">Voir la réponse</span><span lang="en">Show answer</span></button>
+      <div class="answer" id="a18" hidden>
+        <ul lang="fr">
+          <li><strong>Idempotence</strong> : la même config appliquée deux fois → la 2e fois, « No changes ».</li>
+          <li>Plusieurs blocs <code>provider</code> → une ressource utilise celui <strong>sans alias</strong> par défaut ; sinon <code>provider = aws.west</code> (nom, point, alias, sans guillemets).</li>
+          <li><code>terraform apply</code> <strong>ne met jamais à jour les providers</strong> : seul <code>init -upgrade</code> le fait.</li>
+          <li>Nombre d'éléments = <code>length()</code>. La fonction <code>size()</code> n'existe pas.</li>
+          <li>Niveaux de providers : <strong>Official = HashiCorp</strong>, Partner = entreprises, Community = particuliers.</li>
+          <li>Un parent ne voit un module <strong>qu'à travers ses outputs</strong> (<code>module.appel.output</code>) ; une variable d'enfant sans <code>default</code> est <strong>obligatoire</strong>.</li>
+        </ul>
+        <ul lang="en">
+          <li><strong>Idempotency</strong>: the same configuration applied twice → the second time, "No changes".</li>
+          <li>Several <code>provider</code> blocks → a resource uses the one <strong>without an alias</strong> by default; otherwise <code>provider = aws.west</code> (name, dot, alias, no quotes).</li>
+          <li><code>terraform apply</code> <strong>never upgrades providers</strong>: only <code>init -upgrade</code> does.</li>
+          <li>Number of elements = <code>length()</code>. There is no <code>size()</code>.</li>
+          <li>Provider tiers: <strong>Official = HashiCorp</strong>, Partner = companies, Community = individuals.</li>
+          <li>A parent sees a module <strong>only through its outputs</strong> (<code>module.call.output</code>); a child variable with no <code>default</code> is <strong>required</strong>.</li>
+        </ul>
+        <pre><code data-hl>provider "aws" { region = "eu-west-3" }                  # default: no alias
+provider "aws" { alias = "west"  region = "us-west-2" }
+
+resource "aws_s3_bucket" "logs" {
+  provider = aws.west                                     # name.alias, no quotes
+  bucket   = "acme-logs"
+}</code></pre>
+        <div class="grade"><button type="button" data-grade="known" aria-pressed="false"><span lang="fr">Je savais</span><span lang="en">I knew it</span></button><button type="button" data-grade="missed" aria-pressed="false"><span lang="fr">Raté</span><span lang="en">Missed it</span></button></div>
+      </div>
+    </article>
+
+  </section>
+
+  <p class="empty" id="empty" hidden><span lang="fr">Aucune carte « à revoir » pour l'instant. Marque des cartes avec « Raté » pour les retrouver ici.</span><span lang="en">No cards to review yet. Mark cards with "Missed it" to find them here.</span></p>
+
+  <footer>
+    <p lang="fr">Construit à partir de FLASHCARDS.md, TRAPS.md et PROGRESS.md (dépôt terraform-lab). Tes réponses « Je savais / Raté » restent dans ce navigateur uniquement.</p>
+    <p lang="en">Built from FLASHCARDS.md, TRAPS.md and PROGRESS.md (terraform-lab repo). Your "I knew it / Missed it" marks stay in this browser only.</p>
+  </footer>
+</main>
+</div>
+
+<script>
+(function () {
+  var app = document.getElementById("app");
+  var deck = document.getElementById("deck");
+  var cards = Array.prototype.slice.call(deck.querySelectorAll(".card"));
+  var STORE = "tf-trap-cards-v1";
+
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* storage blocked: page still works */ }
+  }
+
+  var scores = load(STORE + ":scores", {});
+
+  /* ---------- syntax highlighting (HCL, shell, JSON) ---------- */
+  var KW = /\b(resource|data|variable|output|module|provider|terraform|locals|dynamic|content|lifecycle|postcondition|precondition|validation|check|assert|import|ephemeral|for_each|count|iterator)\b/;
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function highlight(src) {
+    var re = /(#[^\n]*|\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*"|'[^'\n]*')|\b(resource|data|variable|output|module|provider|terraform|locals|dynamic|content|lifecycle|postcondition|precondition|validation|check|assert|import|ephemeral|for_each|count|iterator)\b|\b(\d+(?:\.\d+)*)\b/g;
+    var out = "", last = 0, m;
+    while ((m = re.exec(src)) !== null) {
+      out += esc(src.slice(last, m.index));
+      var cls = m[1] ? "tk-com" : m[2] ? "tk-str" : m[3] ? "tk-kw" : "tk-num";
+      out += '<span class="' + cls + '">' + esc(m[0]) + "</span>";
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("code[data-hl]"), function (el) {
+    el.innerHTML = highlight(el.textContent);
+  });
+  void KW;
+
+  /* ---------- language ---------- */
+  function setLang(lang) {
+    app.dataset.lang = lang;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-lang-set]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.langSet === lang)); });
+    save(STORE + ":lang", lang);
+  }
+
+  /* ---------- mode ---------- */
+  function setMode(mode) {
+    app.dataset.mode = mode;
+    document.querySelectorAll("[data-mode-set]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.modeSet === mode)); });
+    cards.forEach(function (c) {
+      var ans = c.querySelector(".answer"), btn = c.querySelector(".reveal");
+      ans.hidden = mode !== "read";
+      btn.setAttribute("aria-expanded", String(mode === "read"));
+    });
+    save(STORE + ":mode", mode);
+  }
+
+  /* ---------- filter ---------- */
+  function setFilter(filter) {
+    app.dataset.filter = filter;
+    document.querySelectorAll("[data-filter-set]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.filterSet === filter)); });
+    var shown = 0;
+    cards.forEach(function (c) {
+      var id = c.dataset.id;
+      var visible = filter === "all" || (filter === "top" && c.dataset.top === "1") || (filter === "review" && scores[id] === "missed");
+      c.hidden = !visible;
+      if (visible) shown++;
+    });
+    document.getElementById("empty").hidden = shown !== 0;
+    save(STORE + ":filter", filter);
+  }
+
+  /* ---------- scoring ---------- */
+  function paint() {
+    var known = 0, missed = 0;
+    cards.forEach(function (c) {
+      var s = scores[c.dataset.id];
+      c.classList.toggle("is-known", s === "known");
+      c.classList.toggle("is-missed", s === "missed");
+      c.querySelectorAll("[data-grade]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.grade === s)); });
+      if (s === "known") known++;
+      if (s === "missed") missed++;
+    });
+    document.getElementById("n-known").textContent = known;
+    document.getElementById("n-missed").textContent = missed;
+  }
+
+  deck.addEventListener("click", function (e) {
+    var reveal = e.target.closest(".reveal");
+    if (reveal) {
+      var ans = document.getElementById(reveal.getAttribute("aria-controls"));
+      ans.hidden = !ans.hidden;
+      reveal.setAttribute("aria-expanded", String(!ans.hidden));
+      return;
+    }
+    var grade = e.target.closest("[data-grade]");
+    if (grade) {
+      var id = grade.closest(".card").dataset.id;
+      scores[id] = scores[id] === grade.dataset.grade ? undefined : grade.dataset.grade;
+      if (!scores[id]) delete scores[id];
+      save(STORE + ":scores", scores);
+      paint();
+      if (app.dataset.filter === "review") setFilter("review");
+    }
+  });
+
+  document.querySelectorAll("[data-lang-set]").forEach(function (b) { b.addEventListener("click", function () { setLang(b.dataset.langSet); }); });
+  document.querySelectorAll("[data-mode-set]").forEach(function (b) { b.addEventListener("click", function () { setMode(b.dataset.modeSet); }); });
+  document.querySelectorAll("[data-filter-set]").forEach(function (b) { b.addEventListener("click", function () { setFilter(b.dataset.filterSet); }); });
+
+  document.getElementById("shuffle").addEventListener("click", function () {
+    var order = cards.slice();
+    for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; }
+    order.forEach(function (c) { deck.appendChild(c); });
+  });
+
+  var resetArmed = false, resetBtn = document.getElementById("reset");
+  resetBtn.addEventListener("click", function () {
+    var labels = resetBtn.querySelectorAll("[lang]");
+    if (!resetArmed) {
+      resetArmed = true;
+      labels[0].textContent = "Confirmer ?"; labels[1].textContent = "Confirm?";
+      setTimeout(function () { resetArmed = false; labels[0].textContent = "Remettre à zéro"; labels[1].textContent = "Reset"; }, 3000);
+      return;
+    }
+    resetArmed = false;
+    labels[0].textContent = "Remettre à zéro"; labels[1].textContent = "Reset";
+    scores = {}; save(STORE + ":scores", scores);
+    cards.sort(function (a, b) { return a.dataset.id - b.dataset.id; }).forEach(function (c) { deck.appendChild(c); });
+    paint(); setFilter(app.dataset.filter);
+  });
+
+  setLang(load(STORE + ":lang", "fr"));
+  setMode(load(STORE + ":mode", "quiz"));
+  setFilter(load(STORE + ":filter", "all"));
+  paint();
+})();
+</script>
