@@ -25,6 +25,7 @@
 | 14 | 2026-11-15 | 2 h (Sunday evening, after the A Viculese race) | Mock exam 3 (37/50) + **state lab**: inspected `terraform.tfstate` (address → id = mapping, `dependencies` = metadata); `-replace` on the pet also replaced the dependent file; `serial` 3 → 8 (one increment per state write), `lineage` unchanged; `plan -refresh=false` misses a hand-edited file, `plan` sees it (state as cache); block deleted from code → "will be destroyed (because … is not in configuration)" = the state remembers what the code forgot; a drifted `local_file` is treated as deleted at refresh | `13-state/` |
 | 15 | 2026-11-16 | (cloud session, morning) | `FLASHCARDS.md`: 18 cards built only from repeat offenders | — |
 | 16 | 2026-11-16 | 45 min (Monday evening) | Spoken flashcard round (1st pass 4.5/9, immediate 2nd pass on the misses 5/6, card 05 precedence complete from memory); bilingual HTML page `flashcards.html` (FR/EN, quiz/read modes, code examples, card 19 added); state drill 7/10 | `flashcards.html` |
+| 17 | 2026-11-19 | 50 min (Thursday evening, interrupted by a call) | Flashcard warm-up 4.5/5 + mini mock 20 Q: **16/20 (80 %)** | — |
 
 ## Quiz log
 
@@ -33,6 +34,7 @@
 | 1 | 2026-10-20 | 4/5 | Q4 sensitive values are stored in plain text in state |
 | 2 | 2026-10-20 | 4/5 | Q4 `output` (not `variable`) exposes values and passes them from child to parent module |
 | 3 | 2026-10-20 | 4/5 | Q4 accept drift into state without changing infra = `terraform apply -refresh-only` (`terraform refresh` is deprecated) |
+| Mini mock | 2026-11-19 | **16/20 (80 %)** | First time at the target. Warm-up 4.5/5 (`setting.` prefix finally right, but wrote `.variable` instead of `.value`). Q9 `{for n in var.names : n => length(n)}` → braces + `=>` build a map (square brackets = list) · Q10 locals: C **and** E (computed in the module + avoid repetition) · Q17 raw state JSON = `terraform state pull` (`state show` = one resource) · Q20 several HCP workspaces = `workspaces { tags = [...] }` |
 | Drill 8 (state) | 2026-11-16 | 7/10 | S1 block deleted from code → plan **destroys** it (tonight's "No changes" came from a drifted file) · S7 state lost → plan wants to **recreate everything**, never re-imports by itself · S10 `state show` = all attributes of one resource (`state list` = addresses only). Added as card 19 |
 | Drill 7 | 2026-11-13 | 6/8 | Warm-up before mock 3, options reshuffled: state contents, import, alias, soft-mandatory, `data.`, sensitive output all right. Q4 `dynamic "setting"` → `setting.value` (2nd miss) · Q5 queue a run in another workspace = **run trigger** (2nd miss). No justifications given |
 | Drill 6b | 2026-11-11 | 6/7 | Re-drill after the explanations: run tasks, policies, projects, Local mode, import, alias all right. Q6 state contents: picked "the `variable` blocks" again (3rd time) → proved with a real `terraform.tfstate`: no `variables` key, only `outputs` + `resources` + metadata |
