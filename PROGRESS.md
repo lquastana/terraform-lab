@@ -26,6 +26,7 @@
 | 15 | 2026-11-16 | (cloud session, morning) | `FLASHCARDS.md`: 18 cards built only from repeat offenders | — |
 | 16 | 2026-11-16 | 45 min (Monday evening) | Spoken flashcard round (1st pass 4.5/9, immediate 2nd pass on the misses 5/6, card 05 precedence complete from memory); bilingual HTML page `flashcards.html` (FR/EN, quiz/read modes, code examples, card 19 added); state drill 7/10 | `flashcards.html` |
 | 17 | 2026-11-19 | 50 min (Thursday evening, interrupted by a call) | Flashcard warm-up 4.5/5 + mini mock 20 Q: **16/20 (80 %)** | — |
+| 18 | 2026-11-21 | 45 min (Saturday evening) | Mock exam 4: **44/50 (88 %)**, HCP domain perfect | — |
 
 ## Quiz log
 
@@ -59,6 +60,7 @@
 
 | # | Date | Questions / time | Score | By domain | Missed |
 |---|------|------------------|-------|-----------|--------|
+| 4 | 2026-11-21 | 50 Q / 60 min (finished in **24 min**) | **44/50 (88 %)** | D1 4/4 · D2 4/6 · D3 6/6 · D4 10/11 · D5 4/5 · D6 6/7 · D7 3/4 · D8 **7/7** | Q7 lock file ≠ module versions (card 02, again) · Q10 default provider = the one **without** alias · Q21 default value for a missing key = `lookup` · Q28 public registry = `NAMESPACE/NAME/PROVIDER` · Q36 rename "visible in the plan" = `moved` block (not `state mv`) · Q41 old `terraform import` needs the resource block first. First full mock above the 80 % target |
 | 3 | 2026-11-15 | 50 Q / 60 min (finished in **35 min**, on paper) | **37/50 (74 %)** | D1 3/4 · D2 4/6 · D3 5/6 · D4 8/11 · D5 3/5 · D6 6/7 · D7 3/4 · D8 5/7 | Repeat offenders: Q18 `dynamic "rule"` → `rule.value` (4th miss, answered `self`) · Q6 lock file = provider versions + checksums · Q28 private registry = host in front · Q29 `version` → registry only · Q45 VCS workspace + CLI apply = error. New: Q4 idempotency · Q8 default provider = no alias · Q14 apply never upgrades providers · Q21 `length` (no `size`) · Q25 ephemeral → provider block + write-only · Q39 `-reconfigure` → empty backend = recreate all · Q43 `TF_LOG` alone → stderr · Q48 rights on many workspaces = project. Plateau ~73 % → flashcards for the repeat offenders |
 | 2 | 2026-11-08 | 50 Q / 60 min (finished in **29 min**) | **36/50 (72 %)** | D1 4/4 · D2 3/6 · D3 7/7 · D4 6/11 · D5 5/5 · D6 6/6 · D7 1/4 · D8 4/7 | Q5 Official = HashiCorp · Q9 state purposes · Q10 `provider = aws.west` · Q18 `data.` prefix · Q21 `merge` · Q24 sensitive root output = error · Q26 `self` · Q28 `count` + `for_each` forbidden · Q40 import `to`/`id` · Q42 `terraform show` · Q43 `crash.log` · Q44 CLI-driven · Q46 soft-mandatory · Q50 speculative plans. Used half the time → rushing |
 | 1 | 2026-11-01 | 30 Q / 30 min (finished in ~19 min) | **25/30 (83 %)** | D1 3/3 · D2 4/4 · D3 2/4 · D4 6/7 · D5 3/3 · D6 4/4 · D7 1/3 · D8 2/2 | Q9 `plan -out` · Q10 `fmt -check` · Q12 `data` block · Q26 `plan -generate-config-out` · Q28 `state list` — all "which command / block does X" questions, all practiced in labs |
